@@ -101,6 +101,26 @@ RSpec.describe UserRole do
         expect { subject.can?(:foo) }.to raise_error ArgumentError
       end
     end
+
+    context 'with custom posting-interaction permissions' do
+      it 'supports create, reply, fav, and reblog flags' do
+        role = Fabricate(:user_role,
+                         permissions: UserRole::FLAGS[:create_statuses] |
+                                      UserRole::FLAGS[:reply_to_statuses] |
+                                      UserRole::FLAGS[:fav_statuses] |
+                                      UserRole::FLAGS[:reblog_statuses])
+
+        expect(role.can?(:create_statuses)).to be true
+        expect(role.can?(:reply_to_statuses)).to be true
+        expect(role.can?(:fav_statuses)).to be true
+        expect(role.can?(:reblog_statuses)).to be true
+      end
+
+      it 'categorizes them under interaction' do
+        expect(UserRole::Flags::CATEGORIES[:interaction])
+          .to include(:reply_to_statuses, :fav_statuses, :reblog_statuses)
+      end
+    end
   end
 
   describe '#overrides?' do

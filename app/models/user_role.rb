@@ -37,6 +37,10 @@ class UserRole < ApplicationRecord
     manage_user_access: (1 << 18),
     delete_user_data: (1 << 19),
     view_feeds: (1 << 20),
+    create_statuses: (1 << 21),
+    reply_to_statuses: (1 << 22),
+    fav_statuses: (1 << 23),
+    reblog_statuses: (1 << 24),
   }.freeze
 
   EVERYONE_ROLE_ID = -99
@@ -54,6 +58,12 @@ class UserRole < ApplicationRecord
     CATEGORIES = {
       invites: %i(
         invite_users
+      ).freeze,
+
+      interaction: %i(
+        reply_to_statuses
+        fav_statuses
+        reblog_statuses
       ).freeze,
 
       moderation: %i(

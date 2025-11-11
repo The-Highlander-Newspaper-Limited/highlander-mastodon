@@ -422,6 +422,34 @@ RSpec.describe '/api/v1/statuses' do
           end
         end
       end
+
+      context 'when user role forbids posting' do
+        let(:role_reader) { Fabricate(:user_role, permissions: UserRole::Flags::NONE) }
+        let(:user) { Fabricate(:user, role: role_reader) }
+        let(:scopes) { 'write:statuses' }
+
+        it 'returns forbidden' do
+          post '/api/v1/statuses', headers: headers, params: { status: 'Hello' }
+
+          expect(response).to have_http_status(403).or have_http_status(403)
+          expect(response.parsed_body[:error]).to be_present
+        end
+      end
+
+      context 'when user role allows posting' do
+        let(:role_poster) { Fabricate(:user_role, permissions: UserRole::FLAGS[:create_statuses]) }
+        let(:user) { Fabricate(:user, role: role_poster) }
+        let(:scopes) { 'write:statuses' }
+
+        it 'creates the post successfully' do
+          expect do
+            post '/api/v1/statuses', headers: headers, params: { status: 'Hello world' }
+          end.to change { user.account.statuses.count }.by(1)
+
+          expect(response).to have_http_status(200)
+          expect(response.parsed_body[:content]).to include('Hello world')
+        end
+      end
     end
 
     describe 'DELETE /api/v1/statuses/:id' do

@@ -21,14 +21,20 @@ class StatusPolicy < ApplicationPolicy
 
   # This is about requesting a quote post, not validating it
   def quote?
+    return false unless role.can?(:create_statuses)
+
     show? && record.quote_policy_for_account(current_account, preloaded_relations: @preloaded_relations) != :denied
   end
 
   def reblog?
+    return false unless can_interact?(:reblog_statuses)
+
     !requires_mention? && (!private? || owned?) && show? && !blocking_author?
   end
 
   def favourite?
+    return false unless can_interact?(:fav_statuses)
+
     show? && !blocking_author?
   end
 
@@ -40,6 +46,10 @@ class StatusPolicy < ApplicationPolicy
 
   def update?
     owned?
+  end
+
+  def create?
+    can_interact?(:create_statuses)
   end
 
   private
@@ -92,5 +102,12 @@ class StatusPolicy < ApplicationPolicy
 
   def author
     record.account
+  end
+
+  def can_interact?(interaction)
+    # This lets accounts without users in (e.g. users from fediverse or guests)
+    return true if current_user.nil?
+
+    role.can?(interaction)
   end
 end
