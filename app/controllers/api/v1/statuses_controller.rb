@@ -78,6 +78,8 @@ class Api::V1::StatusesController < Api::BaseController
   end
 
   def create
+    authorize_create
+
     @status = PostStatusService.new.call(
       current_user.account,
       text: status_params[:status],
@@ -218,5 +220,13 @@ class Api::V1::StatusesController < Api::BaseController
 
   def serialized_accounts(accounts)
     ActiveModel::Serializer::CollectionSerializer.new(accounts, serializer: REST::AccountSerializer)
+  end
+
+  def authorize_create
+    if status_params[:in_reply_to_id].present?
+      authorize Status, :reply?
+    else
+      authorize Status, :create?
+    end
   end
 end

@@ -34,7 +34,8 @@
       %label= t('simple_form.labels.user_role.permissions_as_keys')
       %span.hint= t('simple_form.hints.user_role.permissions_as_keys')
 
-    - (form.object.everyone? ? UserRole::Flags::CATEGORIES.slice(:invites) : UserRole::Flags::CATEGORIES).each do |category, permissions|
+    -# Our fork has additional permissions for the everyone role
+    - (form.object.everyone? ? UserRole::Flags::CATEGORIES.slice(:invites, :interaction) : UserRole::Flags::CATEGORIES).each do |category, permissions|
       %h4= t(category, scope: 'admin.roles.categories')
 
       = form.input :permissions_as_keys,

@@ -7,6 +7,12 @@ export const PERMISSION_MANAGE_FEDERATION = 0x0000000000000020;
 export const PERMISSION_MANAGE_REPORTS = 0x0000000000000010;
 export const PERMISSION_VIEW_DASHBOARD = 0x0000000000000008;
 
+// Posting/interaction permissions (mirror server-side UserRole FLAGS)
+export const PERMISSION_CREATE_STATUSES = 0x0000000000200000; // 1 << 21
+export const PERMISSION_REPLY_TO_STATUSES = 0x0000000000400000; // 1 << 22
+export const PERMISSION_REBLOG_STATUSES = 0x0000000000800000; // 1 << 23
+export const PERMISSION_FAV_STATUSES = 0x0000000001000000; // 1 << 24
+
 // These helpers don't quite align with the names/categories in UserRole,
 // but are likely "good enough" for the use cases at present.
 //
@@ -39,3 +45,23 @@ export const canViewFeed = (
       return (permissions & PEMRISSION_VIEW_FEEDS) === PEMRISSION_VIEW_FEEDS;
   }
 };
+
+export function canPost(permissions: number) {
+  return (
+    (permissions & PERMISSION_CREATE_STATUSES) === PERMISSION_CREATE_STATUSES
+  );
+}
+export function canReply(permissions: number) {
+  return (
+    (permissions & PERMISSION_REPLY_TO_STATUSES) ===
+    PERMISSION_REPLY_TO_STATUSES
+  );
+}
+export function canReblog(permissions: number) {
+  return (
+    (permissions & PERMISSION_REBLOG_STATUSES) === PERMISSION_REBLOG_STATUSES
+  );
+}
+export function canFavourite(permissions: number) {
+  return (permissions & PERMISSION_FAV_STATUSES) === PERMISSION_FAV_STATUSES;
+}

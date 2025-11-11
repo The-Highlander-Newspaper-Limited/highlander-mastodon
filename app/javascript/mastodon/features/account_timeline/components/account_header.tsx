@@ -764,6 +764,11 @@ export const AccountHeader: React.FC<{
     );
   });
 
+  // Owner's user permissions
+  const ownerCanPost = account.can_create_statuses; // featured/posts
+  const ownerCanReblog = account.can_reblog_statuses; // posts
+  const ownerCanReply = account.can_reply_to_statuses; // posts_with_replies
+
   return (
     <div className='account-timeline__header'>
       {!hidden && account.memorial && <MemorialNote />}
@@ -883,15 +888,17 @@ export const AccountHeader: React.FC<{
               </div>
 
               <div className='account__header__extra__links'>
-                <NavLink
-                  to={`/@${account.acct}`}
-                  title={intl.formatNumber(account.statuses_count)}
-                >
-                  <ShortNumber
-                    value={account.statuses_count}
-                    renderer={StatusesCounter}
-                  />
-                </NavLink>
+                {(ownerCanPost || ownerCanReblog) && (
+                  <NavLink
+                    to={`/@${account.acct}`}
+                    title={intl.formatNumber(account.statuses_count)}
+                  >
+                    <ShortNumber
+                      value={account.statuses_count}
+                      renderer={StatusesCounter}
+                    />
+                  </NavLink>
+                )}
 
                 <NavLink
                   exact
@@ -922,21 +929,32 @@ export const AccountHeader: React.FC<{
 
       {!(hideTabs || hidden) && (
         <div className='account__section-headline'>
-          <NavLink exact to={`/@${account.acct}/featured`}>
-            <FormattedMessage id='account.featured' defaultMessage='Featured' />
-          </NavLink>
-          <NavLink exact to={`/@${account.acct}`}>
-            <FormattedMessage id='account.posts' defaultMessage='Posts' />
-          </NavLink>
-          <NavLink exact to={`/@${account.acct}/with_replies`}>
-            <FormattedMessage
-              id='account.posts_with_replies'
-              defaultMessage='Posts and replies'
-            />
-          </NavLink>
-          <NavLink exact to={`/@${account.acct}/media`}>
-            <FormattedMessage id='account.media' defaultMessage='Media' />
-          </NavLink>
+          {ownerCanPost && (
+            <NavLink exact to={`/@${account.acct}/featured`}>
+              <FormattedMessage
+                id='account.featured'
+                defaultMessage='Featured'
+              />
+            </NavLink>
+          )}
+          {(ownerCanPost || ownerCanReblog) && (
+            <NavLink exact to={`/@${account.acct}`}>
+              <FormattedMessage id='account.posts' defaultMessage='Posts' />
+            </NavLink>
+          )}
+          {ownerCanReply && (
+            <NavLink exact to={`/@${account.acct}/with_replies`}>
+              <FormattedMessage
+                id='account.posts_with_replies'
+                defaultMessage='Posts and replies'
+              />
+            </NavLink>
+          )}
+          {(ownerCanPost || ownerCanReply) && (
+            <NavLink exact to={`/@${account.acct}/media`}>
+              <FormattedMessage id='account.media' defaultMessage='Media' />
+            </NavLink>
+          )}
         </div>
       )}
 

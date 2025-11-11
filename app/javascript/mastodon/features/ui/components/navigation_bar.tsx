@@ -19,6 +19,7 @@ import { Icon } from 'mastodon/components/icon';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import { useIdentity } from 'mastodon/identity_context';
 import { registrationsOpen, sso_redirect } from 'mastodon/initial_state';
+import { canPost } from 'mastodon/permissions';
 import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
@@ -151,7 +152,7 @@ const LoginOrSignUp: React.FC = () => {
 };
 
 export const NavigationBar: React.FC = () => {
-  const { signedIn } = useIdentity();
+  const { signedIn, permissions } = useIdentity();
   const dispatch = useAppDispatch();
   const open = useAppSelector((state) => state.navigation.open);
   const intl = useIntl();
@@ -182,11 +183,13 @@ export const NavigationBar: React.FC = () => {
               to='/explore'
               icon={<Icon id='' icon={SearchIcon} />}
             />
-            <IconLabelButton
-              title={intl.formatMessage(messages.publish)}
-              to='/publish'
-              icon={<Icon id='' icon={AddIcon} />}
-            />
+            {canPost(permissions) && (
+              <IconLabelButton
+                title={intl.formatMessage(messages.publish)}
+                to='/publish'
+                icon={<Icon id='' icon={AddIcon} />}
+              />
+            )}
             <NotificationsButton />
           </>
         )}

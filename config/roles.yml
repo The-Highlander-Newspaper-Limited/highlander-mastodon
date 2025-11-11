@@ -8,6 +8,10 @@ moderator:
     - manage_users
     - manage_reports
     - manage_taxonomies
+    - create_statuses
+    - reply_to_statuses
+    - reblog_statuses
+    - fav_statuses
 admin:
   name: Admin
   position: 100
@@ -29,8 +33,20 @@ admin:
     - manage_custom_emojis
     - manage_webhooks
     - manage_roles
+    - create_statuses
+    - reply_to_statuses
+    - reblog_statuses
+    - fav_statuses
 owner:
   name: Owner
   position: 1000
   permissions:
     - administrator
+poster:
+  name: Poster
+  position: 0
+  permissions:
+    - create_statuses
+    - reply_to_statuses
+    - reblog_statuses
+    - fav_statuses

@@ -42,7 +42,7 @@ import {
   me,
 } from 'mastodon/initial_state';
 import { transientSingleColumn } from 'mastodon/is_mobile';
-import { canViewFeed } from 'mastodon/permissions';
+import { canViewFeed, canPost } from 'mastodon/permissions';
 import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
@@ -236,7 +236,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
       <div className='navigation-panel__menu'>
         {signedIn && (
           <>
-            {!multiColumn && (
+            {canPost(permissions) && !multiColumn && (
               <ColumnLink
                 to='/publish'
                 icon='plus'

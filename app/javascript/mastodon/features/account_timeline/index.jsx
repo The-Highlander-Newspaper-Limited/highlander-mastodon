@@ -53,6 +53,10 @@ const mapStateToProps = (state, { params: { acct, id, tagged }, withReplies = fa
     suspended: state.getIn(['accounts', accountId, 'suspended'], false),
     hidden: getAccountHidden(state, accountId),
     blockedBy: state.getIn(['relationships', accountId, 'blocked_by'], false),
+    // Owner's user permissions
+    ownerCanCreateStatuses: state.getIn(['accounts', accountId, 'can_create_statuses']),
+    ownerCanReplyToStatuses: state.getIn(['accounts', accountId, 'can_reply_to_statuses']),
+    ownerCanReblogStatuses: state.getIn(['accounts', accountId, 'can_reblog_statuses']),
   };
 };
 
@@ -82,15 +86,27 @@ class AccountTimeline extends ImmutablePureComponent {
 
     dispatch(fetchAccount(accountId));
 
-    if (!withReplies) {
+    const postsHidePermission = this.postsHidePermission(withReplies);
+
+    if (!withReplies && !postsHidePermission) {
       dispatch(expandAccountFeaturedTimeline(accountId, { tagged }));
     }
 
-    dispatch(expandAccountTimeline(accountId, { withReplies, tagged }));
+    if (!postsHidePermission) {
+      dispatch(expandAccountTimeline(accountId, { withReplies, tagged }));
+    }
 
     if (accountId === me) {
       dispatch(connectTimeline(`account:${me}`));
     }
+  }
+
+  postsHidePermission(withReplies) {
+    const { ownerCanCreateStatuses, ownerCanReplyToStatuses, ownerCanReblogStatuses } = this.props;
+
+    return withReplies
+      ? !(ownerCanReplyToStatuses || ownerCanCreateStatuses)
+      : !(ownerCanCreateStatuses || ownerCanReblogStatuses);
   }
 
   componentDidMount () {
@@ -111,10 +127,15 @@ class AccountTimeline extends ImmutablePureComponent {
     } else if (prevProps.params.acct !== acct) {
       dispatch(lookupAccount(acct));
     } else if (prevProps.params.tagged !== tagged) {
-      if (!withReplies) {
+      const postsHidePermission = this.postsHidePermission(withReplies);
+
+      if (!withReplies && !postsHidePermission) {
         dispatch(expandAccountFeaturedTimeline(accountId, { tagged }));
       }
-      dispatch(expandAccountTimeline(accountId, { withReplies, tagged }));
+
+      if (!postsHidePermission) {
+        dispatch(expandAccountTimeline(accountId, { withReplies, tagged }));
+      }
     }
 
     if (prevProps.accountId === me && accountId !== me) {
@@ -131,6 +152,10 @@ class AccountTimeline extends ImmutablePureComponent {
   }
 
   handleLoadMore = maxId => {
+    const postsHidePermission = this.postsHidePermission(this.props.withReplies);
+
+    if (postsHidePermission) return;
+
     this.props.dispatch(expandAccountTimeline(this.props.accountId, { maxId, withReplies: this.props.withReplies, tagged: this.props.params.tagged }));
   };
 

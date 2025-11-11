@@ -31,6 +31,9 @@ import { UploadForm } from './upload_form';
 import { Warning } from './warning';
 import { ComposeQuotedStatus } from './quoted_post';
 import { VisibilityButton } from './visibility_button';
+import { canPost } from 'mastodon/permissions';
+import composeOverride from 'mastodon/lib/compose_override';
+import { withIdentity } from 'mastodon/identity_context';
 
 const allowedAroundShortCode = '><\u0085\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029\u0009\u000a\u000b\u000c\u000d';
 
@@ -136,6 +139,8 @@ class ComposeForm extends ImmutablePureComponent {
       this.props.onChange(this.textareaRef.current.value);
     }
 
+    if (composeOverride.isEnabled()) composeOverride.disable();
+
     if (!this.canSubmit()) {
       return;
     }
@@ -192,6 +197,8 @@ class ComposeForm extends ImmutablePureComponent {
   }
 
   _updateFocusAndSelection = (prevProps) => {
+    if (!canPost(this.props.identity?.permissions) && !composeOverride.isEnabled()) return;
+
     // This statement does several things:
     // - If we're beginning a reply, and,
     //     - Replying to zero or one users, places the cursor at the end of the textbox.
@@ -250,6 +257,10 @@ class ComposeForm extends ImmutablePureComponent {
   render () {
     const { intl, onPaste, autoFocus, withoutNavigation, maxChars, isSubmitting } = this.props;
     const { highlighted } = this.state;
+
+    if (!canPost(this.props.identity?.permissions) && !composeOverride.isEnabled()) {
+      return withoutNavigation ? null : <div className='compose-form'><NavigationBar /></div>;
+    }
 
     return (
       <form className='compose-form' onSubmit={this.handleSubmit}>
@@ -346,4 +357,4 @@ class ComposeForm extends ImmutablePureComponent {
 
 }
 
-export default injectIntl(ComposeForm);
+export default withIdentity(injectIntl(ComposeForm));

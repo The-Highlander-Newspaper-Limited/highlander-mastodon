@@ -37,6 +37,10 @@ class UserRole < ApplicationRecord
     manage_user_access: (1 << 18),
     delete_user_data: (1 << 19),
     view_feeds: (1 << 20),
+    create_statuses: (1 << 21),
+    reply_to_statuses: (1 << 22),
+    reblog_statuses: (1 << 23),
+    fav_statuses: (1 << 24),
   }.freeze
 
   EVERYONE_ROLE_ID = -99
@@ -54,6 +58,16 @@ class UserRole < ApplicationRecord
     CATEGORIES = {
       invites: %i(
         invite_users
+      ).freeze,
+
+      interaction: %i(
+        reply_to_statuses
+        reblog_statuses
+        fav_statuses
+      ).freeze,
+
+      posting: %i(
+        create_statuses
       ).freeze,
 
       moderation: %i(
@@ -88,6 +102,9 @@ class UserRole < ApplicationRecord
         administrator
       ).freeze,
     }.freeze
+
+    # Combined mask for interaction-related permissions (reply/fav/reblog)
+    INTERACTION = CATEGORIES[:interaction].reduce(NONE) { |bitmask, privilege| bitmask | FLAGS[privilege] }
   end
 
   attr_writer :current_account
@@ -200,6 +217,8 @@ class UserRole < ApplicationRecord
   end
 
   def validate_dangerous_permissions
-    errors.add(:permissions_as_keys, :dangerous) if everyone? && Flags::DEFAULT & permissions != permissions
+    # Allow the everyone role to include the default flags plus interaction flags (reply/fav/reblog)
+    allowed_flags = Flags::DEFAULT | Flags::INTERACTION
+    errors.add(:permissions_as_keys, :dangerous) if everyone? && (allowed_flags & permissions) != permissions
   end
 end

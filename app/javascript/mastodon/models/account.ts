@@ -55,6 +55,11 @@ export interface AccountShape
   hidden: boolean;
   moved: string | null;
   url: string;
+  // New boolean flags to indicate the owner's permissions
+  can_create_statuses: boolean;
+  can_reply_to_statuses: boolean;
+  can_reblog_statuses: boolean;
+  can_fav_statuses: boolean;
 }
 
 export type Account = RecordOf<AccountShape>;
@@ -97,6 +102,11 @@ export const accountDefaultValues: AccountShape = {
   // This comes from `ApiMutedAccountJSON`, but we should eventually
   // store that in a different object.
   mute_expires_at: null,
+  // Defaults for permission flags
+  can_create_statuses: false,
+  can_reply_to_statuses: false,
+  can_reblog_statuses: false,
+  can_fav_statuses: false,
 };
 
 const AccountFactory = ImmutableRecord<AccountShape>(accountDefaultValues);

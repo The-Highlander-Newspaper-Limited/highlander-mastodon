@@ -13,6 +13,7 @@ import type { ActionMenuItem } from '@/mastodon/models/dropdown_menu';
 import type { Status } from '@/mastodon/models/status';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import type { SomeRequired } from '@/mastodon/utils/types';
+import { canPost } from 'mastodon/permissions';
 
 import type { RenderItemFn, RenderItemFnHandlers } from '../dropdown_menu';
 import { Dropdown, DropdownMenuItemContent } from '../dropdown_menu';
@@ -92,6 +93,7 @@ const renderMenuItem: RenderItemFn<ActionMenuItem> = (
 interface ReblogButtonProps {
   status: Status;
   counters?: boolean;
+  permissions?: number;
 }
 
 type ActionMenuItemWithIcon = SomeRequired<ActionMenuItem, 'icon'>;
@@ -241,6 +243,11 @@ const ReblogMenuItem: FC<ReblogMenuItemProps> = ({
 
 // Switch between the standalone boost button or the
 // "Boost or quote" menu based on the quickBoosting preference
-export const BoostButton = quickBoosting
-  ? StandaloneBoostButton
-  : BoostOrQuoteMenu;
+export const BoostButton: FC<ReblogButtonProps> = (props) => {
+  const { permissions = 0 } = props;
+  const Component =
+    quickBoosting || !canPost(permissions)
+      ? StandaloneBoostButton
+      : BoostOrQuoteMenu;
+  return <Component {...props} />;
+};

@@ -14,6 +14,11 @@ class REST::AccountSerializer < ActiveModel::Serializer
 
   has_many :emojis, serializer: REST::CustomEmojiSerializer
 
+  attribute :can_create_statuses, if: :local?
+  attribute :can_reply_to_statuses, if: :local?
+  attribute :can_reblog_statuses, if: :local?
+  attribute :can_fav_statuses, if: :local?
+
   attribute :suspended, if: :suspended?
   attribute :silenced, key: :limited, if: :silenced?
   attribute :noindex, if: :local?
@@ -126,6 +131,30 @@ class REST::AccountSerializer < ActiveModel::Serializer
 
   def fields
     object.unavailable? ? [] : object.fields
+  end
+
+  def can_create_statuses
+    return false if object.unavailable? || object.user.nil?
+
+    object.user.role.computed_permissions & UserRole::FLAGS[:create_statuses] == UserRole::FLAGS[:create_statuses]
+  end
+
+  def can_reply_to_statuses
+    return false if object.unavailable? || object.user.nil?
+
+    object.user.role.computed_permissions & UserRole::FLAGS[:reply_to_statuses] == UserRole::FLAGS[:reply_to_statuses]
+  end
+
+  def can_reblog_statuses
+    return false if object.unavailable? || object.user.nil?
+
+    object.user.role.computed_permissions & UserRole::FLAGS[:reblog_statuses] == UserRole::FLAGS[:reblog_statuses]
+  end
+
+  def can_fav_statuses
+    return false if object.unavailable? || object.user.nil?
+
+    object.user.role.computed_permissions & UserRole::FLAGS[:fav_statuses] == UserRole::FLAGS[:fav_statuses]
   end
 
   def suspended

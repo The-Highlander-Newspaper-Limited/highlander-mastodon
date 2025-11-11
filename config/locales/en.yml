@@ -798,6 +798,15 @@ en:
         view_devops_description: Allows users to access Sidekiq and pgHero dashboards
         view_feeds: View live and topic feeds
         view_feeds_description: Allows users to access the live and topic feeds regardless of server settings
+        # TODO: add for other languages
+        create_statuses: Create Posts
+        create_statuses_description: Allows users to create and quote posts
+        fav_statuses: Favourite Posts
+        fav_statuses_description: Allows users to favourite posts
+        reblog_statuses: Boost Posts
+        reblog_statuses_description: Allows users to boost posts
+        reply_to_statuses: Reply to Posts
+        reply_to_statuses_description: Allows users to reply to posts
       title: Roles
     rules:
       add_new: Add rule

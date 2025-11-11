@@ -32,6 +32,7 @@ import { Audio } from 'mastodon/features/audio';
 import scheduleIdleTask from 'mastodon/features/ui/util/schedule_idle_task';
 import { Video } from 'mastodon/features/video';
 import { useIdentity } from 'mastodon/identity_context';
+import { canReblog, canPost, canFavourite } from 'mastodon/permissions';
 
 import Card from './card';
 
@@ -75,7 +76,13 @@ export const DetailedStatus: React.FC<{
   const [showDespiteFilter, setShowDespiteFilter] = useState(false);
   const nodeRef = useRef<HTMLDivElement>();
 
-  const { signedIn } = useIdentity();
+  const { signedIn, permissions } = useIdentity();
+
+  const canReblogFlag = canReblog(permissions);
+  const canPostFlag = canPost(permissions);
+  const canFavouriteFlag = canFavourite(permissions);
+  const interactionCountersFlag =
+    canReblogFlag || canPostFlag || canFavouriteFlag;
 
   const handleOpenVideo = useCallback(
     (options: VideoModalOptions) => {
@@ -453,13 +460,15 @@ export const DetailedStatus: React.FC<{
             </div>
           )}
 
-          <div className='detailed-status__meta__line'>
-            {reblogLink}
-            {reblogLink && <>·</>}
-            {quotesLink}
-            {quotesLink && <>·</>}
-            {favouriteLink}
-          </div>
+          {interactionCountersFlag && (
+            <div className='detailed-status__meta__line'>
+              {canReblogFlag && reblogLink}
+              {canReblogFlag && reblogLink && <>·</>}
+              {canPostFlag && quotesLink}
+              {canPostFlag && quotesLink && <>·</>}
+              {canFavouriteFlag && favouriteLink}
+            </div>
+          )}
         </div>
       </div>
     </div>
