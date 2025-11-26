@@ -4,16 +4,17 @@
 #
 # Table name: invites
 #
-#  id         :bigint(8)        not null, primary key
-#  user_id    :bigint(8)        not null
-#  code       :string           default(""), not null
-#  expires_at :datetime
-#  max_uses   :integer
-#  uses       :integer          default(0), not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  autofollow :boolean          default(FALSE), not null
-#  comment    :text
+#  id           :bigint(8)        not null, primary key
+#  autofollow   :boolean          default(FALSE), not null
+#  code         :string           default(""), not null
+#  comment      :text
+#  expires_at   :datetime
+#  max_uses     :integer
+#  uses         :integer          default(0), not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  user_id      :bigint(8)        not null
+#  user_role_id :bigint(8)
 #
 
 class Invite < ApplicationRecord
@@ -26,10 +27,13 @@ class Invite < ApplicationRecord
 
   belongs_to :user, inverse_of: :invites
   has_many :users, inverse_of: :invite, dependent: nil
+  belongs_to :user_role, optional: true
 
   scope :available, -> { where(expires_at: nil).or(where(expires_at: Time.now.utc..)) }
 
   validates :comment, length: { maximum: COMMENT_SIZE_LIMIT }
+
+  validate :validate_role_assignment, if: :user_role_id_changed?
 
   before_validation :set_code, on: :create
 
@@ -44,5 +48,11 @@ class Invite < ApplicationRecord
       self.code = VALID_CODE_CHARACTERS.sample(8).join
       break if Invite.find_by(code: code).nil?
     end
+  end
+
+  def validate_role_assignment
+    return if user_role.nil? || user.nil?
+
+    errors.add(:user_role_id, :elevated) if user_role.overrides?(user.role)
   end
 end

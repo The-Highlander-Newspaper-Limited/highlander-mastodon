@@ -121,6 +121,7 @@ class UserRole < ApplicationRecord
   before_validation :set_position
 
   scope :assignable, -> { where.not(id: EVERYONE_ROLE_ID).order(position: :asc) }
+  scope :assignable_by, ->(user) { assignable.where(position: ..user.role.position).order(position: :asc) }
 
   has_many :users, inverse_of: :role, foreign_key: 'role_id', dependent: :nullify
 

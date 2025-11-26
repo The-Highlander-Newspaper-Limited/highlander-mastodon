@@ -53,6 +53,10 @@ en:
           attributes:
             effective_date:
               too_soon: is too soon, must be later than %{date}
+        invite:
+          attributes:
+            user_role_id:
+              elevated: cannot be higher than your current role
         user:
           attributes:
             date_of_birth:

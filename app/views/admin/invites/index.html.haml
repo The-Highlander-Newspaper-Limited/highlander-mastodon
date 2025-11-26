@@ -15,7 +15,7 @@
   %p= t('invites.prompt')
 
   = simple_form_for(@invite, url: admin_invites_path) do |form|
-    = render partial: 'invites/form', object: form
+    = render partial: 'admin/invites/form', object: form, locals: { assignable_roles: @assignable_roles }
 
   %hr.spacer/
 
@@ -27,6 +27,7 @@
         %th
         %th= t('invites.table.uses')
         %th= t('invites.table.expires_at')
+        %th= t('admin.invites.role')
         %th
     %tbody
       = render @invites

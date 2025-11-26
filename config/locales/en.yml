@@ -610,6 +610,12 @@ en:
         available: Available
         expired: Expired
         title: Filter
+      no_role: Default role
+      role: Role
+      role_selector:
+        name: Invitee's role
+        no_role_assigned: Default (no special role assigned)
+        role_hint: If selected, users registering with this invite will automatically receive the chosen role
       title: Invites
     ip_blocks:
       add_new: Create rule

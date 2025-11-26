@@ -54,6 +54,7 @@ class Auth::RegistrationsController < Devise::RegistrationsController
 
     resource.locale                 = I18n.locale
     resource.invite_code            = @invite&.code if resource.invite_code.blank?
+    resource.role                   = @invite.user_role if @invite&.user_role.present?
     resource.registration_form_time = session[:registration_form_time]
     resource.sign_up_ip             = request.remote_ip
 

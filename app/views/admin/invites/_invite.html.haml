@@ -26,5 +26,12 @@
       = t('invites.expired')
 
   %td
+    - if invite.user_role.present?
+      %span.user-role
+        = invite.user_role.name
+    - else
+      %span.muted-hint= t('admin.invites.no_role')
+
+  %td
     - if invite.valid_for_use? && policy(invite).destroy?
       = table_link_to 'close', t('invites.delete'), admin_invite_path(invite), method: :delete

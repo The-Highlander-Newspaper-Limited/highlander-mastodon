@@ -5,8 +5,9 @@ module Admin
     def index
       authorize :invite, :index?
 
-      @invites = filtered_invites.includes(user: :account).page(params[:page])
+      @invites = filtered_invites.includes(:user_role, user: :account).page(params[:page])
       @invite  = Invite.new
+      @assignable_roles = UserRole.assignable_by(current_user)
     end
 
     def create
@@ -19,6 +20,7 @@ module Admin
         redirect_to admin_invites_path
       else
         @invites = Invite.page(params[:page])
+        @assignable_roles = UserRole.assignable_by(current_user)
         render :index
       end
     end
@@ -40,7 +42,7 @@ module Admin
 
     def resource_params
       params
-        .expect(invite: [:max_uses, :expires_in])
+        .expect(invite: [:max_uses, :expires_in, :user_role_id])
     end
 
     def filtered_invites
