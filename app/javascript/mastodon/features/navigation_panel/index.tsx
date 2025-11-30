@@ -42,7 +42,7 @@ import {
   me,
 } from 'mastodon/initial_state';
 import { transientSingleColumn } from 'mastodon/is_mobile';
-import { canViewFeed, canPost } from 'mastodon/permissions';
+import { canViewFeed, canPost, canFavourite } from 'mastodon/permissions';
 import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
@@ -300,14 +300,16 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
 
             <FollowedTagsPanel />
 
-            <ColumnLink
-              transparent
-              to='/favourites'
-              icon='star'
-              iconComponent={StarIcon}
-              activeIconComponent={StarActiveIcon}
-              text={intl.formatMessage(messages.favourites)}
-            />
+            {canFavourite(permissions) && (
+              <ColumnLink
+                transparent
+                to='/favourites'
+                icon='star'
+                iconComponent={StarIcon}
+                activeIconComponent={StarActiveIcon}
+                text={intl.formatMessage(messages.favourites)}
+              />
+            )}
             <ColumnLink
               transparent
               to='/bookmarks'
