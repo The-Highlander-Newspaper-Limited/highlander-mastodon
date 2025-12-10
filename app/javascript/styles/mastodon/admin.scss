@@ -1063,6 +1063,14 @@ a.name-tag,
       }
     }
 
+    &__description {
+      padding: 0 15px;
+      display: block;
+      color: $dark-text-color;
+      text-decoration: none;
+      margin-bottom: 10px;
+    }
+
     .icon {
       vertical-align: middle;
     }

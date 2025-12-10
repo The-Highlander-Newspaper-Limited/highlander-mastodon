@@ -1,0 +1,26 @@
+.announcements-list__item
+  - if can?(:update, category)
+    = link_to edit_admin_category_path(category), class: 'announcements-list__item__title' do
+      %span.user-role
+        = material_symbol 'bookmark'
+        = category.name
+  - else
+    %span.announcements-list__item__title
+      %span.user-role
+        = material_symbol 'bookmark'
+        = category.name
+
+  .announcements-list__item__description
+    - if category.description.present?
+      = truncate(category.description, length: 140)
+    - else
+      = t('admin.categories.no_description')
+
+  .announcements-list__item__action-bar
+    .announcements-list__item__meta
+      = link_to t('admin.categories.assigned_accounts', count: category.accounts.count), admin_accounts_path(category_ids: category.id)
+      - if category.mandatory_for_readers
+        ·
+        = t('admin.categories.mandatory_for_readers')
+    .announcements-list__item__actions
+      = table_link_to 'edit', t('admin.accounts.edit'), edit_admin_category_path(category) if can?(:update, category)

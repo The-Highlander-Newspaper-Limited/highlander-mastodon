@@ -37,6 +37,7 @@ admin:
     - reply_to_statuses
     - reblog_statuses
     - fav_statuses
+    - manage_categories
 owner:
   name: Owner
   position: 1000

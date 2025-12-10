@@ -4,6 +4,7 @@ class AccountFilter
   KEYS = %i(
     origin
     status
+    category_ids
     role_ids
     username
     by_domain
@@ -48,6 +49,8 @@ class AccountFilter
     case key.to_s
     when 'origin'
       origin_scope(value)
+    when 'category_ids'
+      category_scope(value)
     when 'role_ids'
       role_scope(value)
     when 'status'
@@ -114,6 +117,10 @@ class AccountFilter
 
   def invited_by_scope(value)
     Account.left_joins(user: :invite).merge(Invite.where(user_id: value.to_s))
+  end
+
+  def category_scope(value)
+    Account.joins(:account_categories).where(account_categories: { category_id: Array(value).map(&:to_s) }).distinct
   end
 
   def role_scope(value)

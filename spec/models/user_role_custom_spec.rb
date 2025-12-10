@@ -4,9 +4,46 @@ require 'rails_helper'
 
 RSpec.describe UserRole, :skip_compatibility_role do
   describe 'Constants' do
+    describe 'FLAGS' do
+      context 'with statuses creation and interaction flags' do
+        it 'includes create_statuses, reply_to_statuses, reblog_statuses and fav_statuses flags' do
+          expect(described_class::FLAGS)
+            .to include(:create_statuses, :reply_to_statuses, :reblog_statuses, :fav_statuses)
+        end
+
+        it 'assigns bit values to create_statuses, reply_to_statuses, reblog_statuses and fav_statuses flags' do
+          expect(described_class::FLAGS[:create_statuses]).to eq(1 << 21)
+          expect(described_class::FLAGS[:reply_to_statuses]).to eq(1 << 22)
+          expect(described_class::FLAGS[:reblog_statuses]).to eq(1 << 23)
+          expect(described_class::FLAGS[:fav_statuses]).to eq(1 << 24)
+        end
+      end
+
+      context 'with managing categories flag' do
+        it 'includes manage_categories flag' do
+          expect(described_class::FLAGS).to include(:manage_categories)
+        end
+
+        it 'assigns bit value to manage_categories' do
+          expect(described_class::FLAGS[:manage_categories]).to eq(1 << 25)
+        end
+      end
+    end
+
+    describe 'Flags::CATEGORIES' do
+      it 'includes reply_to_statuses, reblog_statuses and fav_statuses in interaction category' do
+        expect(UserRole::Flags::CATEGORIES[:interaction])
+          .to include(:reply_to_statuses, :reblog_statuses, :fav_statuses)
+      end
+
+      it 'includes manage_categories in administration category' do
+        expect(described_class::Flags::CATEGORIES[:administration]).to include(:manage_categories)
+      end
+    end
+
     describe 'Flags::INTERACTION' do
       it 'is the combination of reply, favorite and reblog flags' do
-        expected = UserRole::FLAGS[:reply_to_statuses] | UserRole::FLAGS[:fav_statuses] | UserRole::FLAGS[:reblog_statuses]
+        expected = UserRole::FLAGS[:reply_to_statuses] | UserRole::FLAGS[:reblog_statuses] | UserRole::FLAGS[:fav_statuses]
 
         expect(UserRole::Flags::INTERACTION).to eq(expected)
       end
@@ -81,23 +118,28 @@ RSpec.describe UserRole, :skip_compatibility_role do
   describe '#can?' do
     subject { Fabricate :user_role }
 
-    context 'with custom posting-interaction permissions' do
-      it 'supports create, reply, fav, and reblog flags' do
-        role = Fabricate(:user_role,
-                         permissions: UserRole::FLAGS[:create_statuses] |
-                                      UserRole::FLAGS[:reply_to_statuses] |
-                                      UserRole::FLAGS[:fav_statuses] |
-                                      UserRole::FLAGS[:reblog_statuses])
-
-        expect(role.can?(:create_statuses)).to be true
-        expect(role.can?(:reply_to_statuses)).to be true
-        expect(role.can?(:fav_statuses)).to be true
-        expect(role.can?(:reblog_statuses)).to be true
+    context 'with posting-interaction permissions' do
+      let(:role) do
+        Fabricate(:user_role,
+                  permissions: UserRole::FLAGS[:create_statuses] |
+                               UserRole::FLAGS[:reply_to_statuses] |
+                               UserRole::FLAGS[:reblog_statuses] |
+                               UserRole::FLAGS[:fav_statuses])
       end
 
-      it 'categorizes them under interaction' do
-        expect(UserRole::Flags::CATEGORIES[:interaction])
-          .to include(:reply_to_statuses, :fav_statuses, :reblog_statuses)
+      it 'supports create, reply, fav, and reblog flags' do
+        expect(role.can?(:create_statuses)).to be true
+        expect(role.can?(:reply_to_statuses)).to be true
+        expect(role.can?(:reblog_statuses)).to be true
+        expect(role.can?(:fav_statuses)).to be true
+      end
+    end
+
+    context 'with permission to manage categories' do
+      let(:role) { Fabricate(:user_role, permissions: described_class::FLAGS[:manage_categories]) }
+
+      it 'supports manage_categories flag' do
+        expect(role.can?(:manage_categories)).to be true
       end
     end
   end

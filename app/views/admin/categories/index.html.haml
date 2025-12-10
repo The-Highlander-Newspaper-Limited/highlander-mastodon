@@ -1,0 +1,16 @@
+- content_for :page_title do
+  = t('admin.categories.title')
+
+- content_for :heading_actions do
+  = link_to t('admin.categories.add_new'), new_admin_category_path, class: 'button' if can?(:create, :category)
+
+%p= t('admin.categories.description_html')
+
+%hr.spacer/
+
+- if @categories.empty?
+  .muted-hint.text-center
+    = t('admin.categories.empty')
+- else
+  .announcements-list
+    = render partial: 'category', collection: @categories

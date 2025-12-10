@@ -1,0 +1,10 @@
+---
+en:
+  admin:
+    accounts:
+      categories:
+        no_categories_assigned: No categories assigned
+        edit:
+          link: Change categories
+          page_title: Edit categories for %{username}
+        changed_msg: Categories successfully changed!

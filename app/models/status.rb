@@ -183,6 +183,7 @@ class Status < ApplicationRecord
                    ],
                    thread: :account
 
+  delegate :categories, to: :account, allow_nil: true
   delegate :domain, :indexable?, to: :account, prefix: true
 
   REAL_TIME_WINDOW = 6.hours

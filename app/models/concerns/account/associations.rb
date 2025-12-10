@@ -68,5 +68,9 @@ module Account::Associations
 
     # BulkImport records owned by account
     has_many :bulk_imports, inverse_of: :account, dependent: :delete_all
+
+    # Categories assigned to account
+    has_many :account_categories, inverse_of: :account, dependent: :destroy
+    has_many :categories, through: :account_categories
   end
 end

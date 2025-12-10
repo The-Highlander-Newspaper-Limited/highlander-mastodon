@@ -1,0 +1,9 @@
+%tr
+  %th= t('admin.categories.title')
+  %td
+    - if account.categories.blank?
+      = t('admin.accounts.no_categories_assigned')
+    - else
+      = account.categories.ordered.pluck(:name).join(', ')
+  %td
+    = table_link_to 'bookmarks', t('admin.accounts.categories.edit.link'), admin_account_categories_path(account.id) if can?(:change_categories, account)

@@ -41,6 +41,7 @@ class UserRole < ApplicationRecord
     reply_to_statuses: (1 << 22),
     reblog_statuses: (1 << 23),
     fav_statuses: (1 << 24),
+    manage_categories: (1 << 25),
   }.freeze
 
   EVERYONE_ROLE_ID = -99
@@ -92,6 +93,7 @@ class UserRole < ApplicationRecord
         manage_webhooks
         manage_custom_emojis
         manage_announcements
+        manage_categories
       ).freeze,
 
       devops: %i(

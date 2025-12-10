@@ -1,0 +1,7 @@
+- content_for :page_title do
+  = t('admin.categories.add_new')
+
+= simple_form_for @category, url: admin_categories_path do |form|
+  = render partial: 'form', object: form
+  .actions
+    = form.button :button, t('admin.categories.add_new'), type: :submit

@@ -1,0 +1,6 @@
+.filter-subset.filter-subset--with-select
+  %strong= t('admin.categories.title')
+  .input.select.optional
+    = form.select :category_ids,
+                  options_from_collection_for_select(Category.ordered, :id, :name, params[:category_ids]),
+                  prompt: I18n.t('generic.all')

@@ -1,0 +1,10 @@
+- content_for :page_title do
+  = t('admin.categories.edit', name: @category.name)
+
+- content_for :heading_actions do
+  = link_to t('admin.categories.delete'), admin_category_path(@category), method: :delete, data: { confirm: t('admin.accounts.are_you_sure') }, class: 'button button--destructive' if can?(:destroy, @category)
+
+= simple_form_for @category, url: admin_category_path(@category) do |form|
+  = render partial: 'form', object: form
+  .actions
+    = form.button :button, t('generic.save_changes'), type: :submit

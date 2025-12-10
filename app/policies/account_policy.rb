@@ -64,4 +64,8 @@ class AccountPolicy < ApplicationPolicy
   def review?
     role.can?(:manage_taxonomies)
   end
+
+  def change_categories?
+    role.can?(:manage_categories)
+  end
 end

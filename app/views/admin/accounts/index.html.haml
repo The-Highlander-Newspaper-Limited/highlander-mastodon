@@ -21,6 +21,7 @@
         = form.select :role_ids,
                       options_from_collection_for_select(UserRole.assignable, :id, :name, params[:role_ids]),
                       prompt: I18n.t('admin.accounts.moderation.all')
+    = render 'category_filter', form: form
     .filter-subset.filter-subset--with-select
       %strong= t 'generic.order_by'
       .input.select

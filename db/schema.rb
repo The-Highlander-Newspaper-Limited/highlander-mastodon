@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_25_151256) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_02_000846) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_151256) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "uri"], name: "index_account_aliases_on_account_id_and_uri", unique: true
+  end
+
+  create_table "account_categories", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "category_id"], name: "index_account_categories_on_account_id_and_category_id", unique: true
+    t.index ["account_id"], name: "index_account_categories_on_account_id"
+    t.index ["category_id", "account_id"], name: "index_account_categories_on_category_id_and_account_id"
+    t.index ["category_id"], name: "index_account_categories_on_category_id"
   end
 
   create_table "account_conversations", force: :cascade do |t|
@@ -349,6 +360,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_151256) do
     t.datetime "updated_at", null: false
     t.index ["canonical_email_hash"], name: "index_canonical_email_blocks_on_canonical_email_hash", unique: true
     t.index ["reference_account_id"], name: "index_canonical_email_blocks_on_reference_account_id"
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "mandatory_for_readers", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_categories_on_name", unique: true
   end
 
   create_table "conversation_mutes", force: :cascade do |t|
@@ -1350,6 +1370,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_25_151256) do
   end
 
   add_foreign_key "account_aliases", "accounts", on_delete: :cascade
+  add_foreign_key "account_categories", "accounts", on_delete: :cascade
+  add_foreign_key "account_categories", "categories", on_delete: :cascade
   add_foreign_key "account_conversations", "accounts", on_delete: :cascade
   add_foreign_key "account_conversations", "conversations", on_delete: :cascade
   add_foreign_key "account_deletion_requests", "accounts", on_delete: :cascade

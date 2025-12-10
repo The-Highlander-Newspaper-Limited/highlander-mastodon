@@ -3,6 +3,8 @@
 namespace :admin do
   get '/dashboard', to: 'dashboard#index'
 
+  draw 'admin/categories'
+
   resources :domain_allows, only: [:new, :create, :destroy]
   resources :domain_blocks, only: [:new, :create, :destroy, :update, :edit] do
     collection do

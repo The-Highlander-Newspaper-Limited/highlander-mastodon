@@ -8,6 +8,7 @@
     %th= t('admin.accounts.header')
     %td= table_link_to 'delete', t('admin.accounts.remove_header'), remove_header_admin_account_path(account.id), method: :post, data: { confirm: t('admin.accounts.are_you_sure') } if can?(:remove_header, account)
     %td
+= render 'admin/accounts/categories', account: account # Full path needed since this partial is rendered from multiple controller contexts
 %tr
   %th= t('admin.accounts.role')
   %td

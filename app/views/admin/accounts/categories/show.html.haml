@@ -1,0 +1,20 @@
+- content_for :page_title do
+  = t('admin.accounts.categories.edit.page_title', username: @account.username)
+
+= simple_form_for @account, url: admin_account_categories_path(@account.id) do |f|
+  = f.hidden_field :category_ids, multiple: true, value: nil
+  - Category.ordered.each do |category|
+    .announcements-list
+      .announcements-list__item
+        %span.announcements-list__item__title
+          %span.user-role
+            = f.check_box :category_ids, { multiple: true }, category.id, nil
+            = category.name
+          - if category.description.present?
+            .announcements-list__item__description
+              = truncate(category.description, length: 140)
+
+  .actions
+    = f.button :button,
+               t('generic.save_changes'),
+               type: :submit
