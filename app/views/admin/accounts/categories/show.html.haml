@@ -2,6 +2,11 @@
   = t('admin.accounts.categories.edit.page_title', username: @account.username)
 
 = simple_form_for @account, url: admin_account_categories_path(@account.id) do |f|
+  - if @account.errors.any?
+    - @account.errors[:categories].each do |error|
+      .flash-message.alert
+        %strong= error
+
   = f.hidden_field :category_ids, multiple: true, value: nil
   - Category.ordered.each do |category|
     .announcements-list

@@ -75,5 +75,21 @@ RSpec.describe 'Admin Accounts' do
         expect(account.reload.categories).to be_empty
       end
     end
+
+    context 'when validation fails (poster without categories)' do
+      let(:poster_role) { Fabricate(:user_role, name: 'Poster') }
+
+      before do
+        account.user.update!(role: poster_role)
+        account.categories.clear
+      end
+
+      it 'returns unprocessable_entity and re-renders the form' do
+        patch admin_account_categories_path(account.id), params: { account: { category_ids: [] } }
+
+        expect(response).to have_http_status(422)
+        expect(response.body).to include(I18n.t('admin.accounts.categories.edit.page_title', username: account.username))
+      end
+    end
   end
 end

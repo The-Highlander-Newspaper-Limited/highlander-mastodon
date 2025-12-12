@@ -1,0 +1,34 @@
+---
+en:
+  activerecord:
+    errors:
+      models:
+        account:
+          attributes:
+            categories:
+              poster_role: Poster users must have at least one category
+  admin:
+    accounts:
+      categories:
+        no_categories_assigned: No categories assigned
+        edit:
+          link: Change categories
+          page_title: Edit categories for %{username}
+        changed_msg: Categories successfully changed!
+    categories:
+      title: Categories
+      add_new: Add category
+      edit: Edit category %{name}
+      delete: Delete category
+      description_html: Manage account categories used to label accounts. Posts inherit categories from their author.
+      no_description: No description
+      mandatory_for_readers: Mandatory for readers
+      mandatory_for_readers_hint: Readers won't be able to unsubscribe from this category
+      assigned_accounts:
+        one: 1 account
+        other: "%{count} accounts"
+      empty: No categories yet.
+    roles:
+      privileges:
+        manage_categories: Manage categories
+        manage_categories_description: Allows creating, editing, and deleting account categories
