@@ -16,6 +16,7 @@ import { ContentWarning } from 'mastodon/components/content_warning';
 import { FilterWarning } from 'mastodon/components/filter_warning';
 import { Icon }  from 'mastodon/components/icon';
 import { PictureInPicturePlaceholder } from 'mastodon/components/picture_in_picture_placeholder';
+import { CategoryBadges } from 'mastodon/components/category_badges';
 import { withOptionalRouter, WithOptionalRouterPropTypes } from 'mastodon/utils/react_router';
 
 import Card from '../features/status/components/card';
@@ -597,6 +598,8 @@ class Status extends ImmutablePureComponent {
                 />
               )}
             </div>
+
+            <CategoryBadges categories={status.getIn(['account', 'categories'])} />
 
             {matchedFilters && <FilterWarning title={matchedFilters.join(', ')} expanded={this.state.showDespiteFilter} onClick={this.handleFilterToggle} />}
 

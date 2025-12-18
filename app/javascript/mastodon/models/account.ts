@@ -8,6 +8,8 @@ import type {
   ApiAccountRoleJSON,
   ApiAccountJSON,
 } from 'mastodon/api_types/accounts';
+import type { AccountCategory } from 'mastodon/custom/account_categories';
+import { mapCategoriesFromJSON } from 'mastodon/custom/account_categories';
 import { unescapeHTML } from 'mastodon/utils/html';
 
 import { CustomEmojiFactory } from './custom_emoji';
@@ -44,11 +46,15 @@ const AccountRoleFactory = ImmutableRecord<AccountRoleShape>({
 // Account
 export interface AccountShape
   extends Required<
-    Omit<ApiAccountJSON, 'emojis' | 'fields' | 'roles' | 'moved' | 'url'>
+    Omit<
+      ApiAccountJSON,
+      'emojis' | 'fields' | 'roles' | 'moved' | 'url' | 'categories'
+    >
   > {
   emojis: ImmutableList<CustomEmoji>;
   fields: ImmutableList<AccountField>;
   roles: ImmutableList<AccountRole>;
+  categories: ImmutableList<AccountCategory>;
   display_name_html: string;
   note_emojified: string;
   note_plain: string | null;
@@ -87,6 +93,7 @@ export const accountDefaultValues: AccountShape = {
   note_emojified: '',
   note_plain: 'string',
   roles: ImmutableList<AccountRole>(),
+  categories: ImmutableList<AccountCategory>(),
   uri: '',
   url: '',
   username: '',
@@ -143,6 +150,7 @@ export function createAccountFromServerJSON(serverJSON: ApiAccountJSON) {
     roles: ImmutableList(
       serverJSON.roles?.map((role) => AccountRoleFactory(role)),
     ),
+    categories: mapCategoriesFromJSON(serverJSON),
     display_name_html: escapeTextContentForBrowser(displayName),
     note_emojified: accountNote,
     note_plain: unescapeHTML(accountNote),

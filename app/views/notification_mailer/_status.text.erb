@@ -10,3 +10,9 @@
 <% end %>
 
 <%= raw t('application_mailer.view')%> <%= web_url("@#{status.account.pretty_acct}/#{status.id}") %>
+
+<% if status.account.categories.any? %>
+
+Categories: <%= status.account.categories.ordered.map(&:name).join(', ') %>
+
+<% end %>

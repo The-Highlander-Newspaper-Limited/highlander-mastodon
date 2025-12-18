@@ -1,0 +1,6 @@
+-# locals: (status:)
+
+- if status.respond_to?(:categories) && status.categories.any?
+  .category-badges
+    - status.categories.ordered.each do |category|
+      = category_badge(category)

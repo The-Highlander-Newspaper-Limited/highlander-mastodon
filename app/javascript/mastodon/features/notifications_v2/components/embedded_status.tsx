@@ -12,6 +12,7 @@ import BarChart4BarsIcon from '@/material-icons/400-24px/bar_chart_4_bars.svg?re
 import PhotoLibraryIcon from '@/material-icons/400-24px/photo_library.svg?react';
 import { toggleStatusSpoilers } from 'mastodon/actions/statuses';
 import { Avatar } from 'mastodon/components/avatar';
+import { CategoryBadges } from 'mastodon/components/category_badges';
 import { ContentWarning } from 'mastodon/components/content_warning';
 import { DisplayName } from 'mastodon/components/display_name';
 import { Icon } from 'mastodon/components/icon';
@@ -105,6 +106,7 @@ export const EmbeddedStatus: React.FC<{ statusId: string }> = ({
       <div className='notification-group__embedded-status__account'>
         <Avatar account={account} size={16} />
         <DisplayName account={account} />
+        <CategoryBadges categories={account?.get('categories')} />
       </div>
 
       <ContentWarning

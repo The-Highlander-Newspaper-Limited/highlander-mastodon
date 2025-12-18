@@ -13,6 +13,8 @@
     %td.email-status-content
       = render 'notification_mailer/status_content', status: status
 
+      = render 'admin/shared/category_badges', status: status
+
       - if status.local? && status.quote
         %table.email-inner-card-table{ cellspacing: 0, cellpadding: 0, border: 0, role: 'presentation' }
           %tr

@@ -26,6 +26,7 @@
             = acct(status.account)
 
   = render partial: 'admin/shared/status_content', locals: { status: status.proper, is_quote: is_quote }
+  = render 'admin/shared/category_badges', status: status.proper
 
   - unless is_quote
     .detailed-status__meta

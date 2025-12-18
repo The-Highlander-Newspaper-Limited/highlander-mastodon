@@ -2,6 +2,7 @@
 @use 'sass:math';
 @use 'functions' as *;
 @use 'variables' as *;
+@use 'categories';
 
 $no-columns-breakpoint: 890px;
 $sidebar-width: 300px;

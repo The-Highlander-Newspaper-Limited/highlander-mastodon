@@ -3,6 +3,7 @@
 class REST::AccountSerializer < ActiveModel::Serializer
   include RoutingHelper
   include FormattingHelper
+  include REST::Custom::AccountCategories
 
   # Please update `app/javascript/mastodon/api_types/accounts.ts` when making changes to the attributes
 

@@ -1,3 +1,5 @@
+import type { ApiAccountCategoryJSON } from 'mastodon/custom/account_categories';
+
 import type { ApiCustomEmojiJSON } from './custom_emoji';
 
 export interface ApiAccountFieldJSON {
@@ -44,6 +46,7 @@ export interface BaseApiAccountJSON {
   limited?: boolean;
   memorial?: boolean;
   hide_collections: boolean;
+  categories?: ApiAccountCategoryJSON[];
 }
 
 // See app/serializers/rest/muted_account_serializer.rb

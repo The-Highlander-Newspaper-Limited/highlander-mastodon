@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import { AnimatedNumber } from 'mastodon/components/animated_number';
 import { Avatar } from 'mastodon/components/avatar';
+import { CategoryBadges } from 'mastodon/components/category_badges';
 import { ContentWarning } from 'mastodon/components/content_warning';
 import { DisplayName } from 'mastodon/components/display_name';
 import { EditedTimestamp } from 'mastodon/components/edited_timestamp';
@@ -392,6 +393,8 @@ export const DetailedStatus: React.FC<{
             </>
           )}
         </Link>
+
+        <CategoryBadges categories={status.getIn(['account', 'categories'])} />
 
         {matchedFilters && (
           <FilterWarning
