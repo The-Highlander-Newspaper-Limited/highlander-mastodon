@@ -1,4 +1,4 @@
-import type { ApiAccountCategoryJSON } from 'mastodon/custom/account_categories';
+import type { ApiAccountCategoryJSON } from '@/mastodon/api_types/account_categories';
 
 import type { ApiCustomEmojiJSON } from './custom_emoji';
 

@@ -1,17 +1,17 @@
-import { List as ImmutableList, Record as ImmutableRecord } from 'immutable';
+import { List as ImmutableList } from 'immutable';
 
 import { render, screen } from '@/testing/rendering';
+import { AccountCategoryFactory } from 'mastodon/models/account_categories';
 
 import { CategoryBadges } from '../category_badges';
 
 describe('<CategoryBadges />', () => {
-  const CategoryRecord = ImmutableRecord({
-    name: '',
-    mandatory_for_readers: false,
-  });
-
   const createCategory = (name: string, mandatory: boolean) =>
-    CategoryRecord({ name, mandatory_for_readers: mandatory });
+    AccountCategoryFactory({
+      id: name.toLowerCase(),
+      name,
+      mandatory_for_readers: mandatory,
+    });
 
   it('renders nothing when categories is null', () => {
     const { container } = render(<CategoryBadges categories={null} />);

@@ -7,12 +7,14 @@ import { debounce } from 'lodash';
 import { scrollTopTimeline, loadPending } from '../../../actions/timelines';
 import StatusList from '../../../components/status_list';
 import { me } from '../../../initial_state';
+import { selectCategoryFilterContext, shouldHideStatusByCategory } from '../util/status_list_category_filters';
 
 const makeGetStatusIds = (pending = false) => createSelector([
   (state, { type }) => state.getIn(['settings', type], ImmutableMap()),
   (state, { type }) => state.getIn(['timelines', type, pending ? 'pendingItems' : 'items'], ImmutableList()),
   (state)           => state.get('statuses'),
-], (columnSettings, statusIds, statuses) => {
+  selectCategoryFilterContext,
+], (columnSettings, statusIds, statuses, { accounts, hiddenCategories, timelineType }) => {
   return statusIds.filter(id => {
     if (id === null || id === 'inline-follow-suggestions') return true;
 
@@ -29,6 +31,10 @@ const makeGetStatusIds = (pending = false) => createSelector([
     }
 
     if (columnSettings.getIn(['shows', 'quote']) === false && statusForId.get('quote') !== null) {
+      return false;
+    }
+
+    if (timelineType === 'home' && shouldHideStatusByCategory(statusForId, statuses, accounts, hiddenCategories)) {
       return false;
     }
 

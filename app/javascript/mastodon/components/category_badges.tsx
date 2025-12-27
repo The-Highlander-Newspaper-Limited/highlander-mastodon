@@ -2,7 +2,7 @@ import type React from 'react';
 
 import type { List as ImmutableList } from 'immutable';
 
-import type { AccountCategory } from 'mastodon/custom/account_categories';
+import type { AccountCategory } from '@/mastodon/models/account_categories';
 
 const CATEGORY_COLORS = {
   borderRed: '#dd3333',

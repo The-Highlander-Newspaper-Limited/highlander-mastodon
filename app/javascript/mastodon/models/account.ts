@@ -8,8 +8,8 @@ import type {
   ApiAccountRoleJSON,
   ApiAccountJSON,
 } from 'mastodon/api_types/accounts';
-import type { AccountCategory } from 'mastodon/custom/account_categories';
-import { mapCategoriesFromJSON } from 'mastodon/custom/account_categories';
+import type { AccountCategory } from 'mastodon/models/account_categories';
+import { mapCategoriesFromJSON } from 'mastodon/models/account_categories';
 import { unescapeHTML } from 'mastodon/utils/html';
 
 import { CustomEmojiFactory } from './custom_emoji';

@@ -18,7 +18,7 @@ RSpec.describe 'Home', :inline_jobs do
     it_behaves_like 'forbidden for wrong scope', 'write write:statuses'
 
     context 'when the timeline is available' do
-      let(:home_statuses) { bob.statuses + ana.statuses }
+      let(:home_statuses) { bob.statuses.without_reblogs + tim.statuses + ana.statuses }
       let!(:bob)          { Fabricate(:account) }
       let!(:tim)          { Fabricate(:account) }
       let!(:ana)          { Fabricate(:account) }

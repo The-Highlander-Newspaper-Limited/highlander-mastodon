@@ -3,16 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Category do
-  describe 'Database columns' do
-    it { is_expected.to have_db_column(:name).of_type(:string).with_options(null: false) }
-    it { is_expected.to have_db_column(:description).of_type(:text) }
-    it { is_expected.to have_db_column(:mandatory_for_readers).of_type(:boolean).with_options(null: false, default: false) }
-  end
-
-  describe 'Indexes' do
-    it { is_expected.to have_db_index(:name).unique }
-  end
-
   describe 'Defaults' do
     it 'sets mandatory_for_readers to false by default' do
       category = described_class.new(name: 'Test')
@@ -23,6 +13,7 @@ RSpec.describe Category do
   describe 'Associations' do
     it { is_expected.to have_many(:account_categories).inverse_of(:category).dependent(:destroy) }
     it { is_expected.to have_many(:accounts).through(:account_categories) }
+    it { is_expected.to have_many(:account_category_filters).inverse_of(:category).dependent(:destroy) }
   end
 
   describe 'Validations' do

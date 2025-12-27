@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_02_000846) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_18_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,6 +32,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_000846) do
     t.index ["account_id"], name: "index_account_categories_on_account_id"
     t.index ["category_id", "account_id"], name: "index_account_categories_on_category_id_and_account_id"
     t.index ["category_id"], name: "index_account_categories_on_category_id"
+  end
+
+  create_table "account_category_filters", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "category_id"], name: "index_account_category_filters_on_account_id_and_category_id", unique: true
+    t.index ["account_id"], name: "index_account_category_filters_on_account_id"
+    t.index ["category_id"], name: "index_account_category_filters_on_category_id"
   end
 
   create_table "account_conversations", force: :cascade do |t|
@@ -1372,6 +1382,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_000846) do
   add_foreign_key "account_aliases", "accounts", on_delete: :cascade
   add_foreign_key "account_categories", "accounts", on_delete: :cascade
   add_foreign_key "account_categories", "categories", on_delete: :cascade
+  add_foreign_key "account_category_filters", "accounts", on_delete: :cascade
+  add_foreign_key "account_category_filters", "categories", on_delete: :cascade
   add_foreign_key "account_conversations", "accounts", on_delete: :cascade
   add_foreign_key "account_conversations", "conversations", on_delete: :cascade
   add_foreign_key "account_deletion_requests", "accounts", on_delete: :cascade

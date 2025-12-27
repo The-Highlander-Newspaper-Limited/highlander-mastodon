@@ -55,7 +55,6 @@ RSpec.describe PrecomputeFeedService do
         )
 
         expect(home_timeline_ids).to_not include(
-          requested_status.id,
           unknown_reply.id,
           unreadable_dm_from_followed.id,
           muted_status.id,
@@ -63,7 +62,6 @@ RSpec.describe PrecomputeFeedService do
         )
 
         expect(list_timeline_ids).to_not include(
-          requested_status.id,
           unknown_reply.id,
           unreadable_dm_from_followed.id,
           muted_status.id,

@@ -209,8 +209,6 @@ export default function timelines(state = initialState, action) {
   case blockAccountSuccess.type:
   case muteAccountSuccess.type:
     return filterTimelines(state, action.payload.relationship, action.payload.statuses);
-  case unfollowAccountSuccess.type:
-    return filterTimeline('home', state, action.payload.relationship, action.payload.statuses);
   case TIMELINE_SCROLL_TOP:
     return updateTop(state, action.timeline, action.top);
   case TIMELINE_CONNECT:

@@ -65,6 +65,7 @@ class User < ApplicationRecord
   include User::Omniauthable
   include User::PamAuthenticable
   include User::CategoryAssignment
+  prepend User::HomeFeedGeneration
 
   devise :two_factor_authenticatable,
          otp_secret_length: 32

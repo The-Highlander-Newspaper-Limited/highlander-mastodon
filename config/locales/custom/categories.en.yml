@@ -7,6 +7,10 @@ en:
           attributes:
             categories:
               poster_role: Poster users must have at least one category
+        account_category_filter:
+          attributes:
+            category:
+              mandatory: cannot be filtered because it is mandatory for readers
   admin:
     accounts:
       categories:
@@ -32,3 +36,9 @@ en:
       privileges:
         manage_categories: Manage categories
         manage_categories_description: Allows creating, editing, and deleting account categories
+  api:
+    category_filters:
+      errors:
+        mandatory: Cannot filter mandatory category
+        not_found: Category filter not found
+        category_not_found: Category not found

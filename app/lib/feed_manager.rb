@@ -5,6 +5,7 @@ require 'singleton'
 class FeedManager
   include Singleton
   include Redisable
+  prepend Custom::CategoryBasedFeed
 
   # Maximum number of items stored in a single feed
   MAX_ITEMS = 800

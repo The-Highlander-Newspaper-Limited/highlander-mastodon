@@ -72,5 +72,8 @@ module Account::Associations
     # Categories assigned to account
     has_many :account_categories, inverse_of: :account, dependent: :destroy
     has_many :categories, through: :account_categories
+
+    # Categories the account chose to filter out
+    has_many :account_category_filters, inverse_of: :account, dependent: :destroy
   end
 end

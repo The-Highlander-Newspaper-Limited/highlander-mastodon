@@ -2,6 +2,7 @@
 
 class FanOutOnWriteService < BaseService
   include Redisable
+  prepend Custom::AllReadersDelivery
 
   # Push a status into home and mentions feeds
   # @param [Status] status

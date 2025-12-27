@@ -24,8 +24,8 @@ import Column from '../../components/column';
 import ColumnHeader from '../../components/column_header';
 import StatusListContainer from '../ui/containers/status_list_container';
 
-import { ColumnSettings } from './components/column_settings';
 import { CriticalUpdateBanner } from './components/critical_update_banner';
+import { CategoryFilters } from './components/category_filters';
 import { Announcements } from './components/announcements';
 
 const messages = defineMessages({
@@ -164,12 +164,11 @@ class HomeTimeline extends PureComponent {
           extraButton={announcementsButton}
           appendContent={hasAnnouncements && showAnnouncements && <Announcements />}
         >
-          <ColumnSettings />
         </ColumnHeader>
 
         {signedIn ? (
           <StatusListContainer
-            prepend={banners}
+            prepend={signedIn ? [...banners, <CategoryFilters key='category-filters' />] : banners}
             alwaysPrepend
             trackScroll={!pinned}
             scrollKey={`home_timeline-${columnId}`}
