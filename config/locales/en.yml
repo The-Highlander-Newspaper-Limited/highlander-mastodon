@@ -4,7 +4,7 @@ en:
     about_mastodon_html: 'The social network of the future: No ads, no corporate surveillance, ethical design, and decentralization! Own your data with Mastodon!'
     contact_missing: Not set
     contact_unavailable: N/A
-    hosted_on: Mastodon hosted on %{domain}
+    hosted_on: The Highlander Community App
     title: About
   accounts:
     followers:
@@ -1300,12 +1300,12 @@ en:
       new_confirmation_instructions_sent: You will receive a new email with the confirmation link in a few minutes!
       title: Check your inbox
     sign_in:
-      preamble_html: Login with your <strong>%{domain}</strong> credentials. If your account is hosted on a different server, you will not be able to log in here.
-      title: Login to %{domain}
+      preamble_html: Login with your <strong>The Highlander</strong> credentials.
+      title: Login to The Highlander
     sign_up:
       manual_review: Sign-ups on %{domain} go through manual review by our moderators. To help us process your registration, write a bit about yourself and why you want an account on %{domain}.
       preamble: With an account on this Mastodon server, you'll be able to follow any other person on the fediverse, regardless of where their account is hosted.
-      title: Let's get you set up on %{domain}.
+      title: Let's get you set up on The Highlander.
     status:
       account_status: Account status
       confirming: Waiting for email confirmation to be completed.
@@ -1421,7 +1421,7 @@ en:
       content: We're sorry, but something went wrong on our end.
       title: This page is not correct
     '503': The page could not be served due to a temporary server failure.
-    noscript_html: To use the Mastodon web application, please enable JavaScript. Alternatively, try one of the <a href="%{apps_path}">native apps</a> for Mastodon for your platform.
+    noscript_html: To use The Highlander web application, please enable JavaScript.
   existing_username_validator:
     not_found: could not find a local user with that username
     not_found_multiple: could not find %{usernames}

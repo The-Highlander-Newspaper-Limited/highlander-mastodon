@@ -1,7 +1,7 @@
 @use '../fonts/inter';
 
 body {
-  accent-color: #6364ff;
+  accent-color: #d33;
   overflow-wrap: anywhere;
   margin: 0;
   background-color: #f3f2f5;
@@ -46,7 +46,7 @@ table + p {
   min-width: 280px;
   font-family: Inter, 'Lucida Grande', sans-serif;
   overflow-wrap: anywhere;
-  color: #17063b;
+  color: #111;
   background-color: #f3f2f5;
 }
 
@@ -64,7 +64,7 @@ table + p {
 
 .email-card-td {
   overflow: hidden;
-  box-shadow: 0 4px 16px 0 rgba(23, 6, 59, 4%);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 4%);
   background-color: #fff;
 }
 
@@ -79,7 +79,7 @@ table + p {
 .email-inner-card-td {
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 16px 0 rgba(23, 6, 59, 8%);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 8%);
   background-color: #fff;
   border: 1px solid #dfdee3;
 }
@@ -147,13 +147,13 @@ table + p {
   font-size: 16px;
   font-weight: 600;
   line-height: 24px;
-  color: #17063b;
+  color: #111;
 }
 
 .email-account-handle {
   font-size: 14px;
   line-height: 20px;
-  color: #746a89;
+  color: #666;
 }
 
 .email-account-stats-table {
@@ -161,12 +161,12 @@ table + p {
     padding-right: 16px;
     font-size: 14px;
     line-height: 20px;
-    color: #746a89;
+    color: #666;
   }
 
   b {
     font-weight: 600;
-    color: #17063b;
+    color: #111;
   }
 
   span {
@@ -184,7 +184,7 @@ table + p {
   p,
   ul,
   ol {
-    color: #17063b;
+    color: #111;
     font-size: 14px;
     line-height: 20px;
 
@@ -193,11 +193,11 @@ table + p {
     }
 
     a:not([class]) {
-      color: #6364ff;
+      color: #d33;
       text-decoration: none;
 
       &:hover {
-        color: #563acc !important;
+        color: #b82a2a !important;
       }
     }
   }
@@ -366,7 +366,7 @@ table + p {
   border-radius: 12px;
   background-color: #fff;
   border: 2px solid #fff;
-  box-shadow: 0 4px 16px 0 rgba(23, 6, 59, 8%);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 8%);
 }
 
 .email-header-card {
@@ -397,7 +397,7 @@ table + p {
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
-  color: #17063b;
+  color: #111;
   font-size: 14px;
   line-height: 20px;
   font-weight: 600;
@@ -409,7 +409,7 @@ table + p {
 
 .email-header-card-description {
   margin-bottom: 12px;
-  color: #746a89;
+  color: #666;
   font-size: 12px;
   line-height: 16px;
   max-height: 32px;
@@ -458,14 +458,14 @@ table + p {
   & > p {
     font-size: 14px;
     line-height: 20px;
-    color: #17063b;
+    color: #111;
 
     a {
-      color: #6364ff;
+      color: #d33;
       text-decoration: none;
 
       &:hover {
-        color: #563acc !important;
+        color: #b82a2a !important;
       }
     }
   }
@@ -474,7 +474,7 @@ table + p {
 // Texts
 .email-h2 {
   margin-bottom: 4px;
-  color: #17063b;
+  color: #111;
   font-size: 18px;
   font-weight: 600;
   line-height: 28px;
@@ -482,14 +482,14 @@ table + p {
 
 .email-h-sub {
   margin-bottom: 16px;
-  color: #746a89;
+  color: #666;
   font-size: 14px;
   line-height: 16px;
 }
 
 .email-p {
   margin-bottom: 16px;
-  color: #746a89;
+  color: #666;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -527,7 +527,7 @@ table + p {
   max-width: 100%;
   border-collapse: separate;
   border-radius: 8px;
-  background-color: #6364ff;
+  background-color: #d33;
 }
 
 .email-btn-td {
@@ -594,26 +594,26 @@ table + p {
   font-size: 16px;
   font-weight: 600;
   line-height: 24px;
-  color: #17063b;
+  color: #111;
 }
 
 .email-status-header-handle {
   font-size: 14px;
   line-height: 20px;
-  color: #746a89;
+  color: #666;
 }
 
 .email-quote-header-name {
   font-size: 14px;
   font-weight: 600;
   line-height: 18px;
-  color: #17063b;
+  color: #111;
 }
 
 .email-quote-header-handle {
   font-size: 13px;
   line-height: 18px;
-  color: #746a89;
+  color: #666;
 }
 
 .email-status-content {
@@ -621,7 +621,7 @@ table + p {
 }
 
 .email-status-spoiler {
-  color: #746a89;
+  color: #666;
   font-style: italic;
   margin-bottom: 8px;
 }
@@ -635,17 +635,17 @@ table + p {
     font-size: 14px;
     line-height: 20px;
     margin-bottom: 20px;
-    color: #17063b;
+    color: #111;
     white-space: pre-wrap;
     unicode-bidi: plaintext;
   }
 
   a {
-    color: #6364ff;
+    color: #d33;
     text-decoration: none;
 
     &:hover {
-      color: #563acc !important;
+      color: #b82a2a !important;
     }
   }
 
@@ -669,18 +669,18 @@ table + p {
   margin-top: 16px;
   font-size: 14px;
   line-height: 20px;
-  color: #17063b;
+  color: #111;
 
   img {
     border-radius: 8px;
   }
 
   a {
-    color: #6364ff;
+    color: #d33;
     text-decoration: none;
 
     &:hover {
-      color: #563acc !important;
+      color: #b82a2a !important;
     }
   }
 }
@@ -689,21 +689,21 @@ table + p {
   margin-top: 16px;
   font-size: 12px;
   line-height: 16px;
-  color: #746a89;
+  color: #666;
 
   a {
-    color: #746a89;
+    color: #666;
   }
 
   a:hover {
-    color: #746a89 !important;
+    color: #666 !important;
     text-decoration: underline !important;
   }
 }
 
-// Purple frame for emphasis
+// Frame for emphasis
 .email-frame-table {
-  background-color: #efefff;
+  background-color: #f2f2f2;
   border-radius: 8px;
 }
 
@@ -730,7 +730,7 @@ table + p {
   border-radius: 12px;
   border-width: 1px;
   border-style: solid;
-  border-color: #efefff;
+  border-color: #f2f2f2;
   background-color: #fff;
 }
 
@@ -772,20 +772,20 @@ table + p {
 .email-checklist-text-td {
   h3 {
     margin: 0 0 4px;
-    color: #17063b;
+    color: #111;
     font-size: 14px;
     font-weight: 600;
     line-height: 16.8px;
 
     .email-checklist-checked & {
-      color: #746a89;
+      color: #666;
       text-decoration: line-through;
     }
   }
 
   p {
     margin: 0 0 12px;
-    color: #746a89;
+    color: #666;
     font-size: 14px;
     line-height: 16.8px;
   }
@@ -821,13 +821,13 @@ table + p {
 }
 
 .email-link-with-arrow {
-  color: #6364ff;
+  color: #d33;
   font-size: 14px;
   font-weight: 600;
   line-height: 16.8px;
 
   &:hover {
-    color: #563acc !important;
+    color: #b82a2a !important;
   }
 
   span {
@@ -838,7 +838,7 @@ table + p {
 
 .email-column-action-td {
   padding: 24px 0;
-  color: #6364ff;
+  color: #d33;
   font-size: 14px;
   font-weight: 600;
   line-height: 16.8px;
@@ -876,14 +876,14 @@ table + p {
   vertical-align: top;
 
   h3 {
-    color: #17063b;
+    color: #111;
     font-size: 14px;
     font-weight: 600;
     line-height: 20px;
   }
 
   p {
-    color: #746a89;
+    color: #666;
     font-size: 12px;
     font-weight: 400;
     line-height: 16px;
@@ -916,14 +916,14 @@ table + p {
   }
 
   h3 {
-    color: #17063b;
+    color: #111;
     font-size: 14px;
     font-weight: 600;
     line-height: 20px;
   }
 
   p {
-    color: #746a89;
+    color: #666;
     font-size: 12px;
     font-weight: 400;
     line-height: 16px;
@@ -961,7 +961,7 @@ table + p {
   }
 }
 
-// Extra content on light purple background
+// Extra content on light background
 .email-extra-wave {
   height: 42px;
   background-image: url('../../images/mailer-new/welcome/purple-extra-soft-wave.png');
@@ -971,7 +971,7 @@ table + p {
 
 .email-extra-td {
   padding: 32px 32px 24px;
-  background-color: #f0f0ff;
+  background-color: #f5f5f5;
   background-image: url('../../images/mailer-new/welcome/purple-extra-soft-spacer.png'); // Using an image to maintain the color even in forced dark modes
 
   .email-column-td {

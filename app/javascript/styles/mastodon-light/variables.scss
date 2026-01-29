@@ -7,12 +7,12 @@
 
 $black: #000; // Black
 $white: #fff; // White
-$blurple-500: #6364ff; // Brand purple
-$grey-600: hsl(240deg, 8%, 33%); // Trout
-$grey-100: hsl(240deg, 51%, 90%); // Topaz
+$blurple-500: #d33; // Brand red
+$grey-600: hsl(0deg, 0%, 35%); // Neutral grey
+$grey-100: hsl(0deg, 0%, 90%); // Light neutral grey
 
-$classic-base-color: hsl(240deg, 16%, 19%);
-$classic-secondary-color: hsl(255deg, 25%, 88%);
+$classic-base-color: hsl(0deg, 0%, 10%);
+$classic-secondary-color: hsl(0deg, 0%, 90%);
 $classic-highlight-color: $blurple-500;
 
 @use '../mastodon/variables' with (
@@ -24,7 +24,7 @@ $classic-highlight-color: $blurple-500;
   $base-overlay-background: $white,
 
   $ui-base-color: $classic-secondary-color,
-  $ui-base-lighter-color: hsl(250deg, 24%, 75%),
+  $ui-base-lighter-color: hsl(0deg, 0%, 75%),
   $ui-secondary-color: $classic-base-color,
 
   $ui-button-secondary-color: $grey-600,
@@ -37,10 +37,10 @@ $classic-highlight-color: $blurple-500;
   $darker-text-color: $classic-base-color,
   $lighter-text-color: $classic-base-color,
   $highlight-text-color: $classic-highlight-color,
-  $dark-text-color: hsl(240deg, 16%, 32%),
-  $light-text-color: hsl(240deg, 16%, 32%),
+  $dark-text-color: hsl(0deg, 0%, 32%),
+  $light-text-color: hsl(0deg, 0%, 32%),
   $inverted-text-color: $black,
 
-  $action-button-color: hsl(240deg, 16%, 45%),
+  $action-button-color: hsl(0deg, 0%, 45%),
   $emojis-requiring-inversion: 'chains'
 );
