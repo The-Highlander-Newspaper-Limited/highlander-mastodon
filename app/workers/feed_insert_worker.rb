@@ -3,6 +3,7 @@
 class FeedInsertWorker
   include Sidekiq::Worker
   include DatabaseHelper
+  prepend Custom::CategoryNotifications
 
   def perform(status_id, id, type = 'home', options = {})
     with_primary do

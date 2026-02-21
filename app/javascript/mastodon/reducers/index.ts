@@ -9,6 +9,7 @@ import { accountsMapReducer } from './accounts_map';
 import { alertsReducer } from './alerts';
 import announcements from './announcements';
 import { categoryFiltersReducer } from './category_filters';
+import { categoryNotificationsReducer } from './category_notifications';
 import { composeReducer } from './compose';
 import { contextsReducer } from './contexts';
 import conversations from './conversations';
@@ -48,6 +49,7 @@ const reducers = {
   timelines,
   meta,
   category_filters: categoryFiltersReducer,
+  category_notifications: categoryNotificationsReducer,
   alerts: alertsReducer,
   loadingBar: loadingBarReducer,
   modal: modalReducer,

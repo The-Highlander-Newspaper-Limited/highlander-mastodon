@@ -15,6 +15,7 @@ class Category < ApplicationRecord
   has_many :account_categories, inverse_of: :category, dependent: :destroy
   has_many :accounts, through: :account_categories
   has_many :account_category_filters, inverse_of: :category, dependent: :destroy
+  has_many :account_category_notifications, inverse_of: :category, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
 

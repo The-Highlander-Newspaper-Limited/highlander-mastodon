@@ -14,6 +14,7 @@ RSpec.describe Category do
     it { is_expected.to have_many(:account_categories).inverse_of(:category).dependent(:destroy) }
     it { is_expected.to have_many(:accounts).through(:account_categories) }
     it { is_expected.to have_many(:account_category_filters).inverse_of(:category).dependent(:destroy) }
+    it { is_expected.to have_many(:account_category_notifications).inverse_of(:category).dependent(:destroy) }
   end
 
   describe 'Validations' do

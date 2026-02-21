@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_18_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_17_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_18_120000) do
     t.index ["account_id", "category_id"], name: "index_account_category_filters_on_account_id_and_category_id", unique: true
     t.index ["account_id"], name: "index_account_category_filters_on_account_id"
     t.index ["category_id"], name: "index_account_category_filters_on_category_id"
+  end
+
+  create_table "account_category_notifications", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "category_id"], name: "idx_on_account_id_category_id_a92a815c81", unique: true
+    t.index ["account_id"], name: "index_account_category_notifications_on_account_id"
+    t.index ["category_id"], name: "index_account_category_notifications_on_category_id"
   end
 
   create_table "account_conversations", force: :cascade do |t|
@@ -1384,6 +1394,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_18_120000) do
   add_foreign_key "account_categories", "categories", on_delete: :cascade
   add_foreign_key "account_category_filters", "accounts", on_delete: :cascade
   add_foreign_key "account_category_filters", "categories", on_delete: :cascade
+  add_foreign_key "account_category_notifications", "accounts", on_delete: :cascade
+  add_foreign_key "account_category_notifications", "categories", on_delete: :cascade
   add_foreign_key "account_conversations", "accounts", on_delete: :cascade
   add_foreign_key "account_conversations", "conversations", on_delete: :cascade
   add_foreign_key "account_deletion_requests", "accounts", on_delete: :cascade

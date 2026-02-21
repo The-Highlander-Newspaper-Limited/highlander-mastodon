@@ -46,9 +46,12 @@ class Api::Web::PushSubscriptionsController < Api::Web::BaseController
   end
 
   def default_subscription_data
+    alerts = Notification::TYPES.index_with { alerts_enabled }
+    alerts[:status] = true if current_account&.account_category_notifications&.exists?
+
     {
       policy: 'all',
-      alerts: Notification::TYPES.index_with { alerts_enabled },
+      alerts: alerts,
     }.deep_stringify_keys
   end
 

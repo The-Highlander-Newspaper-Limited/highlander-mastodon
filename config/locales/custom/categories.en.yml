@@ -42,3 +42,7 @@ en:
         mandatory: Cannot filter mandatory category
         not_found: Category filter not found
         category_not_found: Category not found
+    category_notifications:
+      errors:
+        not_found: Category notification not found
+        category_not_found: Category not found

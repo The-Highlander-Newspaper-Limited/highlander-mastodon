@@ -75,5 +75,8 @@ module Account::Associations
 
     # Categories the account chose to filter out
     has_many :account_category_filters, inverse_of: :account, dependent: :destroy
+
+    # Categories the account wants notifications for
+    has_many :account_category_notifications, inverse_of: :account, dependent: :destroy
   end
 end

@@ -1,6 +1,7 @@
 import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
@@ -9,13 +10,26 @@ import Toggle from 'react-toggle';
 
 import ChevronRightIcon from '@/material-icons/400-24px/chevron_right.svg?react';
 import ExpandMoreIcon from '@/material-icons/400-24px/expand_more.svg?react';
+import NotificationsIcon from '@/material-icons/400-24px/notifications.svg?react';
+import NotificationsActiveIcon from '@/material-icons/400-24px/notifications_active-fill.svg?react';
 import {
   addCategoryFilter,
   fetchCategoryFilters,
   removeCategoryFilter,
 } from 'mastodon/actions/category_filters';
+import {
+  addCategoryNotification,
+  fetchCategoryNotifications,
+  removeCategoryNotification,
+} from 'mastodon/actions/category_notifications';
+import { requestBrowserPermission } from 'mastodon/actions/notifications';
+import {
+  changeAlerts,
+  register as registerPushNotifications,
+} from 'mastodon/actions/push_notifications';
 import { CircularProgress } from 'mastodon/components/circular_progress';
 import { Icon } from 'mastodon/components/icon';
+import { IconButton } from 'mastodon/components/icon_button';
 import { me } from 'mastodon/initial_state';
 import type { Account } from 'mastodon/models/account';
 import type { AccountCategory } from 'mastodon/models/account_categories';
@@ -64,6 +78,18 @@ const messages = defineMessages({
   toggleLabel: {
     id: 'home.category_filters.toggle',
     defaultMessage: 'Toggle {category} category',
+  },
+  pushEnable: {
+    id: 'home.category_filters.push_enable',
+    defaultMessage: 'Enable notifications for {category}',
+  },
+  pushDisable: {
+    id: 'home.category_filters.push_disable',
+    defaultMessage: 'Disable notifications for {category}',
+  },
+  pushUnavailable: {
+    id: 'home.category_filters.push_unavailable',
+    defaultMessage: 'Push permission will be requested if needed',
   },
 });
 
@@ -124,9 +150,16 @@ const selectHomeCategories = createAppSelector(
       });
     });
 
-    return Array.from(categories.values()).sort((a, b) =>
-      a.get('name').localeCompare(b.get('name')),
-    );
+    return Array.from(categories.values()).sort((a, b) => {
+      const aMandatory = a.get('mandatory_for_readers') ? 1 : 0;
+      const bMandatory = b.get('mandatory_for_readers') ? 1 : 0;
+
+      if (aMandatory !== bMandatory) {
+        return bMandatory - aMandatory;
+      }
+
+      return a.get('name').localeCompare(b.get('name'));
+    });
   },
 );
 
@@ -157,6 +190,182 @@ const selectSaving = (state: RootState) =>
     'saving',
   ]) as ImmutableMap<string, boolean> | undefined;
 
+const selectNotificationCategories = (state: RootState) =>
+  (state as unknown as ImmutableMap<string, unknown>).getIn([
+    'category_notifications',
+    'items',
+  ]) as ImmutableMap<string, AccountCategory> | undefined;
+
+const selectNotificationsLoading = (state: RootState) =>
+  (state as unknown as ImmutableMap<string, unknown>).getIn(
+    ['category_notifications', 'isLoading'],
+    false,
+  ) as boolean;
+
+const selectNotificationsLoaded = (state: RootState) =>
+  (state as unknown as ImmutableMap<string, unknown>).getIn(
+    ['category_notifications', 'loaded'],
+    false,
+  ) as boolean;
+
+const selectNotificationsSaving = (state: RootState) =>
+  (state as unknown as ImmutableMap<string, unknown>).getIn([
+    'category_notifications',
+    'saving',
+  ]) as ImmutableMap<string, boolean> | undefined;
+
+const selectPushSubscribed = (state: RootState) =>
+  (state as unknown as ImmutableMap<string, unknown>).getIn(
+    ['push_notifications', 'isSubscribed'],
+    false,
+  ) as boolean;
+
+const selectPushStatusEnabled = (state: RootState) =>
+  (state as unknown as ImmutableMap<string, unknown>).getIn(
+    ['push_notifications', 'alerts', 'status'],
+    false,
+  ) as boolean;
+
+const selectBrowserSupport = (state: RootState) =>
+  (state as unknown as ImmutableMap<string, unknown>).getIn(
+    ['notifications', 'browserSupport'],
+    false,
+  ) as boolean;
+
+const selectBrowserPermission = (state: RootState) =>
+  (state as unknown as ImmutableMap<string, unknown>).getIn(
+    ['notifications', 'browserPermission'],
+    'default',
+  ) as string;
+
+interface CategoryFiltersDataParams {
+  dispatch: ReturnType<typeof useAppDispatch>;
+  isLoaded: boolean;
+  isLoading: boolean;
+  isNotificationsLoaded: boolean;
+  isNotificationsLoading: boolean;
+  categoriesLength: number;
+}
+
+const useCategoryFiltersData = ({
+  dispatch,
+  isLoaded,
+  isLoading,
+  isNotificationsLoaded,
+  isNotificationsLoading,
+  categoriesLength,
+}: CategoryFiltersDataParams) => {
+  useEffect(() => {
+    if (!isLoaded && me) {
+      void dispatch(fetchCategoryFilters());
+    }
+  }, [dispatch, isLoaded]);
+
+  useEffect(() => {
+    if (!isNotificationsLoaded && me) {
+      void dispatch(fetchCategoryNotifications());
+    }
+  }, [dispatch, isNotificationsLoaded]);
+
+  return (
+    (!isLoaded ||
+      isLoading ||
+      !isNotificationsLoaded ||
+      isNotificationsLoading) &&
+    categoriesLength === 0
+  );
+};
+
+interface CategoryRowProps {
+  category: AccountCategory;
+  isHidden: boolean;
+  isMandatory: boolean;
+  isSaving: boolean;
+  isNotifySaving: boolean;
+  isNotifyEnabled: boolean;
+  notifyTitle: string;
+  toggleAriaLabel: string;
+  onToggleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onNotifyToggle: () => void;
+}
+
+const CategoryRow: React.FC<CategoryRowProps> = ({
+  category,
+  isHidden,
+  isMandatory,
+  isSaving,
+  isNotifySaving,
+  isNotifyEnabled,
+  notifyTitle,
+  toggleAriaLabel,
+  onToggleChange,
+  onNotifyToggle,
+}) => {
+  const categoryId = getCategoryId(category);
+
+  return (
+    <div className='home-category-filters__item'>
+      <label
+        htmlFor={`home-category-filter-${categoryId}`}
+        className='home-category-filters__toggle'
+      >
+        <Toggle
+          id={`home-category-filter-${categoryId}`}
+          checked={!isHidden}
+          disabled={isSaving || isMandatory}
+          onChange={onToggleChange}
+          aria-label={toggleAriaLabel}
+        />
+
+        <div className='home-category-filters__label'>
+          <span className='home-category-filters__name'>
+            {category.get('name')}
+          </span>
+
+          <div className='home-category-filters__meta'>
+            <span className='home-category-filters__state'>
+              {isHidden ? (
+                <FormattedMessage {...messages.off} />
+              ) : (
+                <FormattedMessage {...messages.on} />
+              )}
+            </span>
+          </div>
+        </div>
+      </label>
+
+      <IconButton
+        className='home-category-filters__notify'
+        icon={isNotifyEnabled ? 'bell' : 'bell-o'}
+        iconComponent={
+          isNotifyEnabled ? NotificationsActiveIcon : NotificationsIcon
+        }
+        active={isNotifyEnabled}
+        title={notifyTitle}
+        onClick={onNotifyToggle}
+        disabled={isNotifySaving}
+      />
+    </div>
+  );
+};
+
+const getNotifyTitle = (
+  intl: IntlShape,
+  categoryName: string,
+  isNotifyEnabled: boolean,
+  browserSupport: boolean,
+  browserPermission: string,
+) => {
+  if (!isNotifyEnabled && browserSupport && browserPermission !== 'granted') {
+    return intl.formatMessage(messages.pushUnavailable);
+  }
+
+  return intl.formatMessage(
+    isNotifyEnabled ? messages.pushDisable : messages.pushEnable,
+    { category: categoryName },
+  );
+};
+
 export const CategoryFilters: React.FC = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -167,12 +376,33 @@ export const CategoryFilters: React.FC = () => {
   const isLoading = useAppSelector(selectIsLoading);
   const isLoaded = useAppSelector(selectIsLoaded);
   const saving = useAppSelector(selectSaving);
+  const notificationCategories = useAppSelector(selectNotificationCategories);
+  const isNotificationsLoading = useAppSelector(selectNotificationsLoading);
+  const isNotificationsLoaded = useAppSelector(selectNotificationsLoaded);
+  const notificationsSaving = useAppSelector(selectNotificationsSaving);
+  const pushSubscribed = useAppSelector(selectPushSubscribed);
+  const pushStatusEnabled = useAppSelector(selectPushStatusEnabled);
+  const browserSupport = useAppSelector(selectBrowserSupport);
+  const browserPermission = useAppSelector(selectBrowserPermission);
+
+  const isStillLoading = useCategoryFiltersData({
+    dispatch,
+    isLoaded,
+    isLoading,
+    isNotificationsLoaded,
+    isNotificationsLoading,
+    categoriesLength: categories.length,
+  });
 
   useEffect(() => {
-    if (!isLoaded && me) {
-      void dispatch(fetchCategoryFilters());
+    if (!pushSubscribed || pushStatusEnabled) {
+      return;
     }
-  }, [dispatch, isLoaded]);
+
+    if (notificationCategories && notificationCategories.size > 0) {
+      dispatch(changeAlerts(['alerts', 'status'], true));
+    }
+  }, [dispatch, notificationCategories, pushStatusEnabled, pushSubscribed]);
 
   const handleToggle = useCallback(
     (categoryId: string, checked: boolean) => {
@@ -196,8 +426,41 @@ export const CategoryFilters: React.FC = () => {
     setExpanded((value) => !value);
   }, []);
 
+  const handleNotificationToggle = useCallback(
+    (categoryId: string) => () => {
+      const isEnabled = notificationCategories?.has(categoryId);
+
+      if (isEnabled) {
+        void dispatch(removeCategoryNotification({ categoryId }));
+        return;
+      }
+
+      void dispatch(addCategoryNotification({ categoryId }));
+
+      if (browserSupport) {
+        if (browserPermission !== 'granted') {
+          dispatch(requestBrowserPermission());
+        } else if (!pushSubscribed) {
+          dispatch(registerPushNotifications());
+        }
+      }
+
+      if (pushSubscribed && !pushStatusEnabled) {
+        dispatch(changeAlerts(['alerts', 'status'], true));
+      }
+    },
+    [
+      browserPermission,
+      browserSupport,
+      dispatch,
+      notificationCategories,
+      pushSubscribed,
+      pushStatusEnabled,
+    ],
+  );
+
   const renderBody = useMemo(() => {
-    if ((!isLoaded || isLoading) && !categories.length) {
+    if (isStillLoading) {
       return (
         <div className='home-category-filters__loading'>
           <CircularProgress size={24} strokeWidth={3} />
@@ -214,62 +477,60 @@ export const CategoryFilters: React.FC = () => {
       );
     }
 
-    const visibleCategories = categories.filter(
-      (category) => !category.get('mandatory_for_readers'),
-    );
-
     return (
       <div className='home-category-filters__list'>
-        {visibleCategories.map((category) => {
+        {categories.map((category) => {
           const categoryId = getCategoryId(category);
-          const isHidden = hiddenCategories?.has(categoryId);
-          const isSaving = saving?.get(categoryId);
-          const inputId = `home-category-filter-${categoryId}`;
+          const categoryName = category.get('name');
+          const isMandatory = category.get('mandatory_for_readers');
+          const isHidden =
+            !isMandatory && Boolean(hiddenCategories?.has(categoryId));
+          const isSaving = Boolean(saving?.get(categoryId));
+          const isNotifySaving = Boolean(notificationsSaving?.get(categoryId));
+          const isNotifyEnabled = Boolean(
+            notificationCategories?.has(categoryId),
+          );
+          const notifyTitle = getNotifyTitle(
+            intl,
+            categoryName,
+            isNotifyEnabled,
+            browserSupport,
+            browserPermission,
+          );
+          const toggleAriaLabel = intl.formatMessage(messages.toggleLabel, {
+            category: categoryName,
+          });
 
           return (
-            <label
+            <CategoryRow
               key={categoryId}
-              htmlFor={inputId}
-              className='home-category-filters__item'
-            >
-              <Toggle
-                id={inputId}
-                checked={!isHidden}
-                disabled={Boolean(isSaving)}
-                onChange={handleToggleChange(categoryId)}
-                aria-label={intl.formatMessage(messages.toggleLabel, {
-                  category: category.get('name'),
-                })}
-              />
-
-              <div className='home-category-filters__label'>
-                <span className='home-category-filters__name'>
-                  {category.get('name')}
-                </span>
-
-                <div className='home-category-filters__meta'>
-                  <span className='home-category-filters__state'>
-                    {isHidden ? (
-                      <FormattedMessage {...messages.off} />
-                    ) : (
-                      <FormattedMessage {...messages.on} />
-                    )}
-                  </span>
-                </div>
-              </div>
-            </label>
+              category={category}
+              isHidden={isHidden}
+              isMandatory={isMandatory}
+              isSaving={isSaving}
+              isNotifySaving={isNotifySaving}
+              isNotifyEnabled={isNotifyEnabled}
+              notifyTitle={notifyTitle}
+              toggleAriaLabel={toggleAriaLabel}
+              onToggleChange={handleToggleChange(categoryId)}
+              onNotifyToggle={handleNotificationToggle(categoryId)}
+            />
           );
         })}
       </div>
     );
   }, [
+    browserPermission,
+    browserSupport,
     categories,
+    handleNotificationToggle,
     handleToggleChange,
     hiddenCategories,
     intl,
-    isLoading,
-    isLoaded,
+    notificationCategories,
+    notificationsSaving,
     saving,
+    isStillLoading,
   ]);
 
   if (!me) return null;

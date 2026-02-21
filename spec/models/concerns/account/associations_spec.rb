@@ -12,5 +12,8 @@ RSpec.describe Account::Associations do
 
     # Categories the account chose to filter out
     it { is_expected.to have_many(:account_category_filters).inverse_of(:account).dependent(:destroy) }
+
+    # Categories the account wants notifications for
+    it { is_expected.to have_many(:account_category_notifications).inverse_of(:account).dependent(:destroy) }
   end
 end
