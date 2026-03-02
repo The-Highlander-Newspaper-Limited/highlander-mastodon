@@ -684,15 +684,13 @@ export function unpinAccountFail(error) {
   };
 }
 
-export const updateAccount = ({ displayName, note, avatar, header, discoverable, indexable }) => (dispatch) => {
+export const updateAccount = ({ displayName, note, avatar, header }) => (dispatch) => {
   const data = new FormData();
 
   data.append('display_name', displayName);
   data.append('note', note);
   if (avatar) data.append('avatar', avatar);
   if (header) data.append('header', header);
-  data.append('discoverable', discoverable);
-  data.append('indexable', indexable);
 
   return api().patch('/api/v1/accounts/update_credentials', data).then(response => {
     dispatch(importFetchedAccount(response.data));

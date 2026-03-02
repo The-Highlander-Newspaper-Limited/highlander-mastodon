@@ -85,6 +85,7 @@ class Account < ApplicationRecord
   include Attachmentable # Load prior to Avatar & Header concerns
 
   include Account::CategoryAssignment
+  include Account::DefaultDiscoverability
   include Account::Associations
   include Account::Avatar
   include Account::Counters
