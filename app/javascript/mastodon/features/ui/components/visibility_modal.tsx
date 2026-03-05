@@ -7,7 +7,6 @@ import classNames from 'classnames';
 
 import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
 import { isQuotePolicy } from '@/mastodon/api_types/quotes';
-import { isStatusVisibility } from '@/mastodon/api_types/statuses';
 import type { StatusVisibility } from '@/mastodon/api_types/statuses';
 import { Button } from '@/mastodon/components/button';
 import { Dropdown } from '@/mastodon/components/dropdown';
@@ -15,9 +14,7 @@ import type { SelectItem } from '@/mastodon/components/dropdown_selector';
 import { IconButton } from '@/mastodon/components/icon_button';
 import { messages as privacyMessages } from '@/mastodon/features/compose/components/privacy_dropdown';
 import { createAppSelector, useAppSelector } from '@/mastodon/store';
-import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
-import LockIcon from '@/material-icons/400-24px/lock.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import QuietTimeIcon from '@/material-icons/400-24px/quiet_time.svg?react';
 
@@ -89,24 +86,6 @@ const selectStatusPolicy = createAppSelector(
   },
 );
 
-const selectDisablePublicVisibilities = createAppSelector(
-  [
-    (state) => state.statuses,
-    (_state, statusId?: string) => !!statusId,
-    (state) => state.compose.get('quoted_status_id') as string | null,
-  ],
-  (statuses, isEditing, statusId) => {
-    if (isEditing || !statusId) return false;
-
-    const status = statuses.get(statusId);
-    if (!status) {
-      return false;
-    }
-
-    return status.get('visibility') === 'private';
-  },
-);
-
 export const VisibilityModal: FC<VisibilityModalProps> = forwardRef(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ({ onClose, onChange, statusId }, _ref) => {
@@ -121,59 +100,35 @@ export const VisibilityModal: FC<VisibilityModalProps> = forwardRef(
     const currentQuotePolicy = useAppSelector((state) =>
       selectStatusPolicy(state, statusId),
     );
-
-    const [visibility, setVisibility] = useState(currentVisibility);
+    const normalizedVisibility =
+      currentVisibility === 'public' || currentVisibility === 'unlisted'
+        ? currentVisibility
+        : 'unlisted';
+    const [visibility, setVisibility] = useState(normalizedVisibility);
     const [quotePolicy, setQuotePolicy] = useState(currentQuotePolicy);
 
     const disableVisibility = !!statusId;
-    const disableQuotePolicy =
-      visibility === 'private' || visibility === 'direct';
-    const disablePublicVisibilities = useAppSelector(
-      selectDisablePublicVisibilities,
-    );
-    const isQuotePost = useAppSelector(
-      (state) => state.compose.get('quoted_status_id') !== null,
-    );
 
     const visibilityItems = useMemo<SelectItem<StatusVisibility>[]>(() => {
-      const items: SelectItem<StatusVisibility>[] = [
+      const unlistedItem: SelectItem<StatusVisibility> = {
+        value: 'unlisted',
+        text: intl.formatMessage(privacyMessages.unlisted_short),
+        meta: intl.formatMessage(privacyMessages.unlisted_long),
+        icon: 'unlock',
+        iconComponent: QuietTimeIcon,
+      };
+
+      return [
         {
-          value: 'private',
-          text: intl.formatMessage(privacyMessages.private_short),
-          meta: intl.formatMessage(privacyMessages.private_long),
-          icon: 'lock',
-          iconComponent: LockIcon,
+          value: 'public',
+          text: intl.formatMessage(privacyMessages.public_short),
+          meta: intl.formatMessage(privacyMessages.public_long),
+          icon: 'globe',
+          iconComponent: PublicIcon,
         },
-        {
-          value: 'direct',
-          text: intl.formatMessage(privacyMessages.direct_short),
-          meta: intl.formatMessage(privacyMessages.direct_long),
-          icon: 'at',
-          iconComponent: AlternateEmailIcon,
-        },
+        unlistedItem,
       ];
-
-      if (!disablePublicVisibilities) {
-        items.unshift(
-          {
-            value: 'public',
-            text: intl.formatMessage(privacyMessages.public_short),
-            meta: intl.formatMessage(privacyMessages.public_long),
-            icon: 'globe',
-            iconComponent: PublicIcon,
-          },
-          {
-            value: 'unlisted',
-            text: intl.formatMessage(privacyMessages.unlisted_short),
-            meta: intl.formatMessage(privacyMessages.unlisted_long),
-            icon: 'unlock',
-            iconComponent: QuietTimeIcon,
-          },
-        );
-      }
-
-      return items;
-    }, [intl, disablePublicVisibilities]);
+    }, [intl]);
     const quoteItems = useMemo<SelectItem<ApiQuotePolicy>[]>(
       () => [
         { value: 'public', text: intl.formatMessage(messages.quotePublic) },
@@ -187,7 +142,7 @@ export const VisibilityModal: FC<VisibilityModalProps> = forwardRef(
     );
 
     const handleVisibilityChange = useCallback((value: string) => {
-      if (isStatusVisibility(value)) {
+      if (value === 'public' || value === 'unlisted') {
         setVisibility(value);
       }
     }, []);
@@ -276,24 +231,9 @@ export const VisibilityModal: FC<VisibilityModalProps> = forwardRef(
                   />
                 </p>
               )}
-              {!statusId && disablePublicVisibilities && (
-                <p
-                  className='visibility-dropdown__helper'
-                  id='visibilityDescriptionId'
-                >
-                  <FormattedMessage
-                    id='visibility_modal.helper.privacy_private_self_quote'
-                    defaultMessage='Self-quotes of private posts cannot be made public.'
-                  />
-                </p>
-              )}
             </div>
 
-            <div
-              className={classNames('visibility-dropdown', {
-                disabled: disableQuotePolicy,
-              })}
-            >
+            <div className='visibility-dropdown'>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label className='visibility-dropdown__label' id={quoteLabelId}>
                 <FormattedMessage
@@ -304,12 +244,11 @@ export const VisibilityModal: FC<VisibilityModalProps> = forwardRef(
 
               <Dropdown
                 items={quoteItems}
-                current={disableQuotePolicy ? 'nobody' : quotePolicy}
+                current={quotePolicy}
                 onChange={handleQuotePolicyChange}
                 labelId={quoteLabelId}
                 descriptionId={quoteDescriptionId}
                 classPrefix='visibility-dropdown'
-                disabled={disableQuotePolicy}
               />
               <QuotePolicyHelper
                 policy={quotePolicy}
@@ -318,21 +257,6 @@ export const VisibilityModal: FC<VisibilityModalProps> = forwardRef(
                 id={quoteDescriptionId}
               />
             </div>
-
-            {isQuotePost && visibility === 'direct' && (
-              <div className='visibility-modal__quote-warning'>
-                <FormattedMessage
-                  id='visibility_modal.direct_quote_warning.title'
-                  defaultMessage="Quotes can't be embedded in private mentions"
-                  tagName='h3'
-                />
-                <FormattedMessage
-                  id='visibility_modal.direct_quote_warning.text'
-                  defaultMessage='If you save the current settings, the embedded quote will be converted to a link.'
-                  tagName='p'
-                />
-              </div>
-            )}
           </div>
           <div className='dialog-modal__content__actions'>
             <Button onClick={onClose} secondary>

@@ -319,7 +319,6 @@ class StatusActionBar extends ImmutablePureComponent {
       } else {
         if (canPost(permissions)) {
           menu.push({ text: intl.formatMessage(messages.mention, { name: account.get('username') }), action: this.handleMentionClick });
-          menu.push({ text: intl.formatMessage(messages.direct, { name: account.get('username') }), action: this.handleDirectClick });
           menu.push(null);
         }
 

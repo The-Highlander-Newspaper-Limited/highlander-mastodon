@@ -24,7 +24,7 @@ import {
   removeAccountFromFollowers,
 } from 'mastodon/actions/accounts';
 import { initBlockModal } from 'mastodon/actions/blocks';
-import { mentionCompose, directCompose } from 'mastodon/actions/compose';
+import { mentionCompose } from 'mastodon/actions/compose';
 import {
   initDomainBlockModal,
   unblockDomain,
@@ -218,14 +218,6 @@ export const AccountHeader: React.FC<{
     dispatch(mentionCompose(account));
   }, [dispatch, account]);
 
-  const handleDirect = useCallback(() => {
-    if (!account) {
-      return;
-    }
-
-    dispatch(directCompose(account));
-  }, [dispatch, account]);
-
   const handleReport = useCallback(() => {
     if (!account) {
       return;
@@ -386,12 +378,6 @@ export const AccountHeader: React.FC<{
           name: account.username,
         }),
         action: handleMention,
-      });
-      arr.push({
-        text: intl.formatMessage(messages.direct, {
-          name: account.username,
-        }),
-        action: handleDirect,
       });
       arr.push(null);
     }
@@ -586,7 +572,6 @@ export const AccountHeader: React.FC<{
     handleBlock,
     handleBlockDomain,
     handleChangeLanguages,
-    handleDirect,
     handleEndorseToggle,
     handleMention,
     handleMute,

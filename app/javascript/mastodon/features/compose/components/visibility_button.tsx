@@ -14,8 +14,6 @@ import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
 import type { StatusVisibility } from '@/mastodon/api_types/statuses';
 import { Icon } from '@/mastodon/components/icon';
 import { useAppSelector, useAppDispatch } from '@/mastodon/store';
-import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
-import LockIcon from '@/material-icons/400-24px/lock.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import QuietTimeIcon from '@/material-icons/400-24px/quiet_time.svg?react';
 
@@ -59,18 +57,6 @@ const visibilityOptions = {
     value: 'unlisted',
     text: privacyMessages.unlisted_short,
   },
-  private: {
-    icon: 'lock',
-    iconComponent: LockIcon,
-    value: 'private',
-    text: privacyMessages.private_short,
-  },
-  direct: {
-    icon: 'at',
-    iconComponent: AlternateEmailIcon,
-    value: 'direct',
-    text: privacyMessages.direct_short,
-  },
 };
 
 const PrivacyModalButton: FC<PrivacyDropdownProps> = ({ disabled = false }) => {
@@ -82,18 +68,19 @@ const PrivacyModalButton: FC<PrivacyDropdownProps> = ({ disabled = false }) => {
   const visibility = useAppSelector(
     (state) => state.compose.get('privacy') as StatusVisibility,
   );
+  const selectedVisibility =
+    visibility === 'public' || visibility === 'unlisted'
+      ? visibility
+      : 'unlisted';
 
   const { icon, iconComponent } = useMemo(() => {
-    const option = visibilityOptions[visibility];
+    const option = visibilityOptions[selectedVisibility];
     return { icon: option.icon, iconComponent: option.iconComponent };
-  }, [visibility]);
+  }, [selectedVisibility]);
   const text = useMemo(() => {
     const visibilityText = intl.formatMessage(
-      visibilityOptions[visibility].text,
+      visibilityOptions[selectedVisibility].text,
     );
-    if (visibility === 'private' || visibility === 'direct') {
-      return visibilityText;
-    }
     if (quotePolicy === 'nobody') {
       return intl.formatMessage(messages.disabled_quote, {
         visibility: visibilityText,
@@ -107,7 +94,7 @@ const PrivacyModalButton: FC<PrivacyDropdownProps> = ({ disabled = false }) => {
     return intl.formatMessage(messages.anyone_quote, {
       visibility: visibilityText,
     });
-  }, [quotePolicy, visibility, intl]);
+  }, [quotePolicy, selectedVisibility, intl]);
 
   const dispatch = useAppDispatch();
 

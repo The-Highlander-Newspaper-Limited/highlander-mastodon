@@ -20,7 +20,7 @@ module Status::Visibility
 
   class_methods do
     def selectable_visibilities
-      visibilities.keys - %w(direct limited)
+      visibilities.keys - %w(private direct limited)
     end
   end
 
