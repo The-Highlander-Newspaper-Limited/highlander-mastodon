@@ -2,7 +2,10 @@ import { Map as ImmutableMap, List as ImmutableList } from 'immutable';
 
 import api, { getLinks } from 'mastodon/api';
 import { compareId } from 'mastodon/compare_id';
-import { usePendingItems as preferPendingItems } from 'mastodon/initial_state';
+import {
+  usePendingItems as preferPendingItems,
+  trendsEnabled,
+} from 'mastodon/initial_state';
 
 import { importFetchedStatus, importFetchedStatuses } from './importer';
 import { submitMarkers } from './markers';
@@ -113,7 +116,7 @@ export function expandTimeline(timelineId, path, params = {}) {
       dispatch(importFetchedStatuses(response.data));
       dispatch(expandTimelineSuccess(timelineId, response.data, next ? next.uri : null, response.status === 206, isLoadingRecent, isLoadingMore, isLoadingRecent && preferPendingItems));
 
-      if (timelineId === 'home' && !isLoadingMore && !isLoadingRecent) {
+      if (timelineId === 'home' && trendsEnabled && !isLoadingMore && !isLoadingRecent) {
         const now = new Date();
         const fittingIndex = response.data.findIndex(status => now - (new Date(status.created_at)) > 4 * 3600 * 1000);
 

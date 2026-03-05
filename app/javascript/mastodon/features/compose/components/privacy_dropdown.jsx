@@ -11,18 +11,21 @@ import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import QuietTimeIcon from '@/material-icons/400-24px/quiet_time.svg?react';
 import { DropdownSelector } from 'mastodon/components/dropdown_selector';
 import { Icon }  from 'mastodon/components/icon';
+import { trendsEnabled } from 'mastodon/initial_state';
 
 export const messages = defineMessages({
   public_short: { id: 'privacy.public.short', defaultMessage: 'Public' },
   public_long: { id: 'privacy.public.long', defaultMessage: 'Anyone on and off Mastodon' },
   unlisted_short: { id: 'privacy.unlisted.short', defaultMessage: 'Quiet public' },
   unlisted_long: { id: 'privacy.unlisted.long', defaultMessage: 'Hidden from Mastodon search results, trending, and public timelines' },
+  unlisted_long_no_trends: { id: 'privacy.unlisted.long_no_trends', defaultMessage: 'Hidden from Mastodon search results and public timelines' },
   private_short: { id: 'privacy.private.short', defaultMessage: 'Followers' },
   private_long: { id: 'privacy.private.long', defaultMessage: 'Only your followers' },
   direct_short: { id: 'privacy.direct.short', defaultMessage: 'Specific people' },
   direct_long: { id: 'privacy.direct.long', defaultMessage: 'Everyone mentioned in the post' },
   change_privacy: { id: 'privacy.change', defaultMessage: 'Change post privacy' },
   unlisted_extra: { id: 'privacy.unlisted.additional', defaultMessage: 'This behaves exactly like public, except the post will not appear in live feeds or hashtags, explore, or Mastodon search, even if you are opted-in account-wide.' },
+  unlisted_extra_no_trends: { id: 'privacy.unlisted.additional_no_trends', defaultMessage: 'This behaves exactly like public, except the post will not appear in live feeds or hashtags, or Mastodon search, even if you are opted-in account-wide.' },
 });
 
 class PrivacyDropdown extends PureComponent {
@@ -85,10 +88,12 @@ class PrivacyDropdown extends PureComponent {
 
   UNSAFE_componentWillMount () {
     const { intl: { formatMessage } } = this.props;
+    const unlistedLong = trendsEnabled ? formatMessage(messages.unlisted_long) : formatMessage(messages.unlisted_long_no_trends);
+    const unlistedExtra = trendsEnabled ? formatMessage(messages.unlisted_extra) : formatMessage(messages.unlisted_extra_no_trends);
 
     this.options = [
       { icon: 'globe', iconComponent: PublicIcon, value: 'public', text: formatMessage(messages.public_short), meta: formatMessage(messages.public_long) },
-      { icon: 'unlock', iconComponent: QuietTimeIcon,  value: 'unlisted', text: formatMessage(messages.unlisted_short), meta: formatMessage(messages.unlisted_long), extra: formatMessage(messages.unlisted_extra) },
+      { icon: 'unlock', iconComponent: QuietTimeIcon,  value: 'unlisted', text: formatMessage(messages.unlisted_short), meta: unlistedLong, extra: unlistedExtra },
     ];
   }
 

@@ -5,6 +5,7 @@ import { defineMessages, useIntl } from 'react-intl';
 import { quoteCompose } from '@/mastodon/actions/compose_typed';
 import { closeModal } from '@/mastodon/actions/modal';
 import { changeSetting } from '@/mastodon/actions/settings';
+import { trendsEnabled } from '@/mastodon/initial_state';
 import type { Status } from '@/mastodon/models/status';
 import { useAppDispatch } from '@/mastodon/store';
 
@@ -15,10 +16,15 @@ const messages = defineMessages({
     id: 'confirmations.quiet_post_quote_info.title',
     defaultMessage: 'Quoting quiet public posts',
   },
-  message: {
+  messageWithTrends: {
     id: 'confirmations.quiet_post_quote_info.message',
     defaultMessage:
       'When quoting a quiet public post, your post will be hidden from trending timelines.',
+  },
+  messageWithoutTrends: {
+    id: 'confirmations.quiet_post_quote_info.message_no_trends',
+    defaultMessage:
+      'When quoting a quiet public post, your post will be hidden from public timelines.',
   },
   got_it: {
     id: 'confirmations.quiet_post_quote_info.got_it',
@@ -67,7 +73,11 @@ export const QuietPostQuoteInfoModal: React.FC<{ status: Status }> = ({
     <ConfirmationModal
       closeWhenConfirm={false} // [1]
       title={intl.formatMessage(messages.title)}
-      message={intl.formatMessage(messages.message)}
+      message={intl.formatMessage(
+        trendsEnabled
+          ? messages.messageWithTrends
+          : messages.messageWithoutTrends,
+      )}
       confirm={intl.formatMessage(messages.got_it)}
       cancel={intl.formatMessage(messages.dismiss)}
       onConfirm={confirm}

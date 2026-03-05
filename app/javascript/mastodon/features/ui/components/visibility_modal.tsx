@@ -13,6 +13,7 @@ import { Dropdown } from '@/mastodon/components/dropdown';
 import type { SelectItem } from '@/mastodon/components/dropdown_selector';
 import { IconButton } from '@/mastodon/components/icon_button';
 import { messages as privacyMessages } from '@/mastodon/features/compose/components/privacy_dropdown';
+import { trendsEnabled } from '@/mastodon/initial_state';
 import { createAppSelector, useAppSelector } from '@/mastodon/store';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
@@ -288,10 +289,15 @@ const QuotePolicyHelper: FC<
   let hintText: React.ReactElement | undefined;
 
   if (visibility === 'unlisted' && policy !== 'nobody') {
-    hintText = (
+    hintText = trendsEnabled ? (
       <FormattedMessage
         id='visibility_modal.helper.unlisted_quoting'
         defaultMessage='When people quote you, their post will also be hidden from trending timelines.'
+      />
+    ) : (
+      <FormattedMessage
+        id='visibility_modal.helper.unlisted_quoting_no_trends'
+        defaultMessage='When people quote you, their post will also be hidden from public timelines.'
       />
     );
   }

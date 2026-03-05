@@ -18,7 +18,11 @@ import { fetchServer } from 'mastodon/actions/server';
 import { Icon } from 'mastodon/components/icon';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import { useIdentity } from 'mastodon/identity_context';
-import { registrationsOpen, sso_redirect } from 'mastodon/initial_state';
+import {
+  registrationsOpen,
+  sso_redirect,
+  trendsEnabled,
+} from 'mastodon/initial_state';
 import { canPost } from 'mastodon/permissions';
 import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
@@ -180,7 +184,7 @@ export const NavigationBar: React.FC = () => {
             />
             <IconLabelButton
               title={intl.formatMessage(messages.search)}
-              to='/explore'
+              to={trendsEnabled ? '/explore' : '/search'}
               icon={<Icon id='' icon={SearchIcon} />}
             />
             {canPost(permissions) && (
