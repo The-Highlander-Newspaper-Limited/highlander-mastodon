@@ -134,10 +134,6 @@ const messages = defineMessages({
     id: 'account.unendorse',
     defaultMessage: "Don't feature on profile",
   },
-  add_or_remove_from_list: {
-    id: 'account.add_or_remove_from_list',
-    defaultMessage: 'Add or Remove from lists',
-  },
   admin_account: {
     id: 'status.admin_account',
     defaultMessage: 'Open moderation interface for @{name}',
@@ -296,21 +292,6 @@ export const AccountHeader: React.FC<{
     }
   }, [dispatch, account, relationship]);
 
-  const handleAddToList = useCallback(() => {
-    if (!account) {
-      return;
-    }
-
-    dispatch(
-      openModal({
-        modalType: 'LIST_ADDER',
-        modalProps: {
-          accountId: account.id,
-        },
-      }),
-    );
-  }, [dispatch, account]);
-
   const handleChangeLanguages = useCallback(() => {
     if (!account) {
       return;
@@ -421,10 +402,6 @@ export const AccountHeader: React.FC<{
             relationship.endorsed ? messages.unendorse : messages.endorse,
           ),
           action: handleEndorseToggle,
-        });
-        arr.push({
-          text: intl.formatMessage(messages.add_or_remove_from_list),
-          action: handleAddToList,
         });
         arr.push(null);
       }
@@ -568,7 +545,6 @@ export const AccountHeader: React.FC<{
     remoteDomain,
     intl,
     signedIn,
-    handleAddToList,
     handleBlock,
     handleBlockDomain,
     handleChangeLanguages,
