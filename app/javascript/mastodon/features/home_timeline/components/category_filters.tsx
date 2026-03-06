@@ -369,7 +369,7 @@ const getNotifyTitle = (
 export const CategoryFilters: React.FC = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   const categories = useAppSelector(selectHomeCategories);
   const hiddenCategories = useAppSelector(selectHiddenCategories);
