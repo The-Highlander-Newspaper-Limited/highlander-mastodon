@@ -21,7 +21,7 @@ class UserSettings
 
   namespace :web do
     setting :advanced_layout, default: false
-    setting :trends, default: true
+    setting :trends, default: false
     setting :use_blurhash, default: true
     setting :use_pending_items, default: false
     setting :use_system_font, default: false
@@ -48,7 +48,7 @@ class UserSettings
     setting :follow_request, default: true
     setting :report, default: true
     setting :pending_account, default: true
-    setting :trends, default: true
+    setting :trends, default: false
     setting :appeal, default: true
     setting :software_updates, default: 'critical', in: %w(none critical patch all)
   end
