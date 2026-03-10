@@ -118,7 +118,7 @@ export const Profile: React.FC<{
       }),
     )
       .then(() => {
-        history.push('/start/follows');
+        history.replace('/home');
         dispatch(closeOnboarding());
         return '';
       })
