@@ -13,11 +13,10 @@ RSpec.describe 'Settings preferences other page' do
     expect(page)
       .to have_private_cache_control
 
-    check language_field(:es)
-    check language_field(:fr)
+    uncheck aggregate_reblogs_field
 
     expect { save_changes }
-      .to change { user.reload.chosen_languages }.to(%w(es fr))
+      .to change { user.reload.settings['aggregate_reblogs'] }.to(false)
     expect(page)
       .to have_title(I18n.t('settings.preferences'))
   end
@@ -26,7 +25,7 @@ RSpec.describe 'Settings preferences other page' do
     within('form') { click_on submit_button }
   end
 
-  def language_field(key)
-    LanguagesHelper::SUPPORTED_LOCALES[key].last
+  def aggregate_reblogs_field
+    form_label('defaults.setting_aggregate_reblogs')
   end
 end
