@@ -80,9 +80,9 @@ class Auth::SessionsController < Devise::SessionsController
     last_url = stored_location_for(:user)
 
     if home_paths(resource).include?(last_url)
-      root_path
+      '/home'
     else
-      last_url || root_path
+      last_url || '/home'
     end
   end
 
@@ -108,7 +108,7 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def home_paths(resource)
-    paths = [about_path, '/explore']
+    paths = [about_path, '/explore', '/public', '/public/local', '/public/remote']
 
     paths << short_account_path(username: resource.account) if single_user_mode? && resource.is_a?(User)
 

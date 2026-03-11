@@ -4,7 +4,6 @@ import { useRef, useCallback, useEffect } from 'react';
 import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 
 import { Helmet } from 'react-helmet';
-import { NavLink } from 'react-router-dom';
 
 import { useIdentity } from '@/mastodon/identity_context';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
@@ -23,7 +22,7 @@ import SettingToggle from '../notifications/components/setting_toggle';
 import StatusListContainer from '../ui/containers/status_list_container';
 
 const messages = defineMessages({
-  title: { id: 'column.firehose', defaultMessage: 'Live feeds' },
+  title: { id: 'column.firehose', defaultMessage: 'Live feed' },
   title_local: {
     id: 'column.firehose_local',
     defaultMessage: 'Live feed for this server',
@@ -192,22 +191,6 @@ const Firehose = ({ feedType, multiColumn }) => {
       >
         <ColumnSettings />
       </ColumnHeader>
-
-      {(canViewFeed(signedIn, permissions, localLiveFeedAccess) && canViewFeed(signedIn, permissions, remoteLiveFeedAccess)) && (
-        <div className='account__section-headline'>
-          <NavLink exact to='/public/local'>
-            <FormattedMessage tagName='div' id='firehose.local' defaultMessage='This server' />
-          </NavLink>
-
-          <NavLink exact to='/public/remote'>
-            <FormattedMessage tagName='div' id='firehose.remote' defaultMessage='Other servers' />
-          </NavLink>
-
-          <NavLink exact to='/public'>
-            <FormattedMessage tagName='div' id='firehose.all' defaultMessage='All' />
-          </NavLink>
-        </div>
-      )}
 
       <StatusListContainer
         prepend={prependBanner}

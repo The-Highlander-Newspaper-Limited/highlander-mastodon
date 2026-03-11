@@ -20,7 +20,6 @@ import NotificationsActiveIcon from '@/material-icons/400-24px/notifications-fil
 import NotificationsIcon from '@/material-icons/400-24px/notifications.svg?react';
 import PersonAddActiveIcon from '@/material-icons/400-24px/person_add-fill.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
-import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import SettingsIcon from '@/material-icons/400-24px/settings.svg?react';
 import StarActiveIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import StarIcon from '@/material-icons/400-24px/star.svg?react';
@@ -34,14 +33,9 @@ import { Search } from 'mastodon/features/compose/components/search';
 import { ColumnLink } from 'mastodon/features/ui/components/column_link';
 import { useBreakpoint } from 'mastodon/features/ui/hooks/useBreakpoint';
 import { useIdentity } from 'mastodon/identity_context';
-import {
-  localLiveFeedAccess,
-  remoteLiveFeedAccess,
-  trendsEnabled,
-  me,
-} from 'mastodon/initial_state';
+import { trendsEnabled, me } from 'mastodon/initial_state';
 import { transientSingleColumn } from 'mastodon/is_mobile';
-import { canViewFeed, canPost, canFavourite } from 'mastodon/permissions';
+import { canPost, canFavourite } from 'mastodon/permissions';
 import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
@@ -57,11 +51,6 @@ const messages = defineMessages({
     defaultMessage: 'Notifications',
   },
   explore: { id: 'explore.title', defaultMessage: 'Trending' },
-  firehose: { id: 'column.firehose', defaultMessage: 'Live feeds' },
-  firehose_singular: {
-    id: 'column.firehose_singular',
-    defaultMessage: 'Live feed',
-  },
   favourites: { id: 'navigation_bar.favourites', defaultMessage: 'Favorites' },
   bookmarks: { id: 'navigation_bar.bookmarks', defaultMessage: 'Bookmarks' },
   preferences: {
@@ -182,13 +171,6 @@ const ProfileCard: React.FC = () => {
   );
 };
 
-const isFirehoseActive = (
-  match: unknown,
-  { pathname }: { pathname: string },
-) => {
-  return !!match || pathname.startsWith('/public');
-};
-
 const MENU_WIDTH = 284;
 
 export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
@@ -263,27 +245,6 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
           />
         )}
 
-        {(canViewFeed(signedIn, permissions, localLiveFeedAccess) ||
-          canViewFeed(signedIn, permissions, remoteLiveFeedAccess)) && (
-          <ColumnLink
-            transparent
-            to={
-              canViewFeed(signedIn, permissions, localLiveFeedAccess)
-                ? '/public/local'
-                : '/public/remote'
-            }
-            icon='globe'
-            iconComponent={PublicIcon}
-            isActive={isFirehoseActive}
-            text={intl.formatMessage(
-              canViewFeed(signedIn, permissions, localLiveFeedAccess) &&
-                canViewFeed(signedIn, permissions, remoteLiveFeedAccess)
-                ? messages.firehose
-                : messages.firehose_singular,
-            )}
-          />
-        )}
-
         {signedIn && (
           <>
             <NotificationsLink />
@@ -337,8 +298,6 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
 
         {!signedIn && (
           <div className='navigation-panel__sign-in-banner'>
-            <hr />
-
             {disabledAccountId ? <DisabledAccountBanner /> : <SignInBanner />}
           </div>
         )}
