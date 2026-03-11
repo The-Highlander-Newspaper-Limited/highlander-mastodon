@@ -35,17 +35,11 @@ const hotkeyTest: Story['play'] = async ({ canvas, userEvent }) => {
   const button = await canvas.findByRole('button');
   await userEvent.click(button);
 
-  await userEvent.keyboard('n');
-  await confirmHotkey('new');
-
   await userEvent.keyboard('/');
   await confirmHotkey('search');
 
   await userEvent.keyboard('o');
   await confirmHotkey('open');
-
-  await userEvent.keyboard('{Alt>}N{/Alt}');
-  await confirmHotkey('forceNew');
 
   await userEvent.keyboard('gh');
   await confirmHotkey('goToHome');
@@ -53,8 +47,8 @@ const hotkeyTest: Story['play'] = async ({ canvas, userEvent }) => {
   await userEvent.keyboard('gn');
   await confirmHotkey('goToNotifications');
 
-  await userEvent.keyboard('gf');
-  await confirmHotkey('goToFavourites');
+  await userEvent.keyboard('gs');
+  await confirmHotkey('goToStart');
 
   /**
    * Ensure that hotkeys are not triggered when certain
@@ -67,8 +61,8 @@ const hotkeyTest: Story['play'] = async ({ canvas, userEvent }) => {
   const input = await canvas.findByRole('textbox');
   await userEvent.click(input);
 
-  await userEvent.keyboard('n');
-  await confirmHotkey('new', false);
+  await userEvent.keyboard('s');
+  await confirmHotkey('search', false);
 
   await userEvent.keyboard('{backspace}');
   await confirmHotkey('None', false);
@@ -91,12 +85,6 @@ export const Default = {
       back: () => {
         setMatchedHotkey(null);
       },
-      new: () => {
-        setMatchedHotkey('new');
-      },
-      forceNew: () => {
-        setMatchedHotkey('forceNew');
-      },
       search: () => {
         setMatchedHotkey('search');
       },
@@ -109,8 +97,8 @@ export const Default = {
       goToNotifications: () => {
         setMatchedHotkey('goToNotifications');
       },
-      goToFavourites: () => {
-        setMatchedHotkey('goToFavourites');
+      goToStart: () => {
+        setMatchedHotkey('goToStart');
       },
     };
 
@@ -139,14 +127,13 @@ export const Default = {
             Last pressed hotkey: <output>{matchedHotkey ?? 'None'}</output>
           </p>
           <p>
-            Click within the dashed border and press the <kbd>n</kbd>
-            or <kbd>/</kbd> key. Press
+            Click within the dashed border and press the <kbd>/</kbd>
+            or <kbd>o</kbd> key. Press
             <kbd>Backspace</kbd> to clear the displayed hotkey.
           </p>
           <p>
             Try typing a sequence, like <kbd>g</kbd> shortly followed by{' '}
-            <kbd>h</kbd>, <kbd>n</kbd>, or
-            <kbd>f</kbd>
+            <kbd>h</kbd>, <kbd>n</kbd>, or <kbd>s</kbd>
           </p>
           <p>
             Note that this playground doesn&apos;t support all hotkeys we use in

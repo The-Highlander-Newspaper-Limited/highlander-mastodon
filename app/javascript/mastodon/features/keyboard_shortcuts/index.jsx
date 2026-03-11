@@ -43,28 +43,8 @@ class KeyboardShortcuts extends ImmutablePureComponent {
             </thead>
             <tbody>
               <tr>
-                <td><kbd>r</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.reply' defaultMessage='to reply' /></td>
-              </tr>
-              <tr>
-                <td><kbd>m</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.mention' defaultMessage='to mention author' /></td>
-              </tr>
-              <tr>
                 <td><kbd>p</kbd></td>
                 <td><FormattedMessage id='keyboard_shortcuts.profile' defaultMessage="to open author's profile" /></td>
-              </tr>
-              <tr>
-                <td><kbd>f</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.favourite' defaultMessage='to favorite' /></td>
-              </tr>
-              <tr>
-                <td><kbd>b</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.boost' defaultMessage='to boost' /></td>
-              </tr>
-              <tr>
-                <td><kbd>q</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.quote' defaultMessage='Quote post' /></td>
               </tr>
               <tr>
                 <td><kbd>enter</kbd>, <kbd>o</kbd></td>
@@ -103,18 +83,6 @@ class KeyboardShortcuts extends ImmutablePureComponent {
                 <td><FormattedMessage id='keyboard_shortcuts.column' defaultMessage='to focus a status in one of the columns' /></td>
               </tr>
               <tr>
-                <td><kbd>n</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.compose' defaultMessage='to focus the compose textarea' /></td>
-              </tr>
-              <tr>
-                <td><kbd>alt</kbd>+<kbd>n</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.toot' defaultMessage='to start a brand new post' /></td>
-              </tr>
-              <tr>
-                <td><kbd>alt</kbd>+<kbd>x</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.spoilers' defaultMessage='to show/hide CW field' /></td>
-              </tr>
-              <tr>
                 <td><kbd>backspace</kbd></td>
                 <td><FormattedMessage id='keyboard_shortcuts.back' defaultMessage='to navigate back' /></td>
               </tr>
@@ -135,28 +103,8 @@ class KeyboardShortcuts extends ImmutablePureComponent {
                 <td><FormattedMessage id='keyboard_shortcuts.notifications' defaultMessage='to open notifications column' /></td>
               </tr>
               <tr>
-                <td><kbd>g</kbd>+<kbd>l</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.local' defaultMessage='to open local timeline' /></td>
-              </tr>
-              <tr>
-                <td><kbd>g</kbd>+<kbd>t</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.federated' defaultMessage='to open federated timeline' /></td>
-              </tr>
-              <tr>
-                <td><kbd>g</kbd>+<kbd>d</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.direct' defaultMessage='to open direct messages column' /></td>
-              </tr>
-              <tr>
                 <td><kbd>g</kbd>+<kbd>s</kbd></td>
                 <td><FormattedMessage id='keyboard_shortcuts.start' defaultMessage='to open "get started" column' /></td>
-              </tr>
-              <tr>
-                <td><kbd>g</kbd>+<kbd>f</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.favourites' defaultMessage='to open favorites list' /></td>
-              </tr>
-              <tr>
-                <td><kbd>g</kbd>+<kbd>p</kbd></td>
-                <td><FormattedMessage id='keyboard_shortcuts.pinned' defaultMessage='to open pinned posts list' /></td>
               </tr>
               <tr>
                 <td><kbd>g</kbd>+<kbd>u</kbd></td>

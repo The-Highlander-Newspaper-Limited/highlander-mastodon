@@ -508,17 +508,6 @@ class UI extends PureComponent {
     this.props.history.push('/notifications');
   };
 
-  handleHotkeyGoToLocal = () => {
-    this.props.history.push('/public/local');
-  };
-
-  handleHotkeyGoToFederated = () => {
-    this.props.history.push('/public');
-  };
-
-  handleHotkeyGoToDirect = () => {
-    this.props.history.push('/conversations');
-  };
 
   handleHotkeyGoToStart = () => {
     this.props.history.push('/getting-started');
@@ -554,10 +543,7 @@ class UI extends PureComponent {
 
     const handlers = {
       help: this.handleHotkeyToggleHelp,
-      new: this.handleHotkeyNew,
       search: this.handleHotkeySearch,
-      forceNew: this.handleHotkeyForceNew,
-      toggleComposeSpoilers: this.handleHotkeyToggleComposeSpoilers,
       focusColumn: this.handleHotkeyFocusColumn,
       focusLoadMore: this.handleHotkeyLoadMore,
       moveDown: this.handleMoveDown,
@@ -565,12 +551,7 @@ class UI extends PureComponent {
       back: this.handleHotkeyBack,
       goToHome: this.handleHotkeyGoToHome,
       goToNotifications: this.handleHotkeyGoToNotifications,
-      goToLocal: this.handleHotkeyGoToLocal,
-      goToFederated: this.handleHotkeyGoToFederated,
-      goToDirect: this.handleHotkeyGoToDirect,
       goToStart: this.handleHotkeyGoToStart,
-      goToFavourites: this.handleHotkeyGoToFavourites,
-      goToPinned: this.handleHotkeyGoToPinned,
       goToProfile: this.handleHotkeyGoToProfile,
       goToBlocked: this.handleHotkeyGoToBlocked,
       goToMuted: this.handleHotkeyGoToMuted,

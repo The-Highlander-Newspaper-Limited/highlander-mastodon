@@ -56,18 +56,6 @@ function any(...keys: string[]): KeyMatcher {
 }
 
 /**
- * Matches a single key combined with the option/alt modifier
- */
-function optionPlus(key: string): KeyMatcher {
-  return (event) => ({
-    // Matching against event.code here as alt combos are often
-    // mapped to other characters
-    isMatch: event.altKey && event.code === `Key${key.toUpperCase()}`,
-    priority: hotkeyPriority.combo,
-  });
-}
-
-/**
  * Matches when all provided keys are pressed in sequence.
  */
 function sequence(...sequence: string[]): KeyMatcher {
@@ -98,32 +86,19 @@ const hotkeyMatcherMap = {
   help: just('?'),
   search: any('s', '/'),
   back: just('backspace'),
-  new: just('n'),
-  forceNew: optionPlus('n'),
   focusColumn: any('1', '2', '3', '4', '5', '6', '7', '8', '9'),
   focusLoadMore: just('l'),
-  reply: just('r'),
-  favourite: just('f'),
-  boost: just('b'),
-  quote: just('q'),
-  mention: just('m'),
   open: any('enter', 'o'),
   openProfile: just('p'),
   moveDown: just('j'),
   moveUp: just('k'),
   toggleHidden: just('x'),
   toggleSensitive: just('h'),
-  toggleComposeSpoilers: optionPlus('x'),
   openMedia: just('e'),
   onTranslate: just('t'),
   goToHome: sequence('g', 'h'),
   goToNotifications: sequence('g', 'n'),
-  goToLocal: sequence('g', 'l'),
-  goToFederated: sequence('g', 't'),
-  goToDirect: sequence('g', 'd'),
   goToStart: sequence('g', 's'),
-  goToFavourites: sequence('g', 'f'),
-  goToPinned: sequence('g', 'p'),
   goToProfile: sequence('g', 'u'),
   goToBlocked: sequence('g', 'b'),
   goToMuted: sequence('g', 'm'),
