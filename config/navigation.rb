@@ -17,7 +17,7 @@ SimpleNavigation::Configuration.run do |navigation|
 
     n.item :preferences, safe_join([material_symbol('settings'), t('settings.preferences')]), settings_preferences_path, if: -> { current_user.functional? && !self_destruct } do |s|
       s.item :appearance, safe_join([material_symbol('computer'), t('settings.appearance')]), settings_preferences_appearance_path
-      s.item :posting_defaults, safe_join([material_symbol('edit_square'), t('preferences.posting_defaults')]), settings_preferences_posting_defaults_path
+      s.item :posting_defaults, safe_join([material_symbol('edit_square'), t('preferences.posting_defaults')]), settings_preferences_posting_defaults_path, if: -> { current_user.can?(:create_statuses) }
       s.item :notifications, safe_join([material_symbol('mail'), t('settings.notifications')]), settings_preferences_notifications_path
       s.item :other, safe_join([material_symbol('tune'), t('preferences.other')]), settings_preferences_other_path
     end
@@ -28,7 +28,7 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     n.item :filters, safe_join([material_symbol('filter_alt'), t('filters.index.title')]), filters_path, highlights_on: %r{/filters}, if: -> { current_user.functional? && !self_destruct }
-    n.item :statuses_cleanup, safe_join([material_symbol('history'), t('settings.statuses_cleanup')]), statuses_cleanup_path, if: -> { current_user.functional_or_moved? && !self_destruct }
+    n.item :statuses_cleanup, safe_join([material_symbol('history'), t('settings.statuses_cleanup')]), statuses_cleanup_path, if: -> { current_user.functional_or_moved? && current_user.can?(:create_statuses) && !self_destruct }
 
     n.item :security, safe_join([material_symbol('account_circle'), t('settings.account')]), edit_user_registration_path do |s|
       s.item :password, safe_join([material_symbol('lock'), t('settings.account_settings')]), edit_user_registration_path, highlights_on: %r{^/auth|/settings/delete|/settings/migration|/settings/aliases|/settings/login_activities|^/disputes}

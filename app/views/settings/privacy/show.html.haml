@@ -13,8 +13,9 @@
 
   %p.lead= t('privacy.reach_hint_html')
 
-  .fields-group
-    = f.input :discoverable, as: :boolean, wrapper: :with_label, recommended: true
+  - if current_user.can?(:create_statuses)
+    .fields-group
+      = f.input :discoverable, as: :boolean, wrapper: :with_label, recommended: true
 
   .fields-group
     = f.input :unlocked, as: :boolean, wrapper: :with_label
@@ -23,8 +24,9 @@
 
   %p.lead= t('privacy.search_hint_html')
 
-  .fields-group
-    = f.input :indexable, as: :boolean, wrapper: :with_label
+  - if current_user.can?(:create_statuses)
+    .fields-group
+      = f.input :indexable, as: :boolean, wrapper: :with_label
 
   = f.simple_fields_for :settings, current_user.settings do |ff|
     .fields-group
@@ -38,8 +40,9 @@
     = f.input :show_collections, as: :boolean, wrapper: :with_label
 
   = f.simple_fields_for :settings, current_user.settings do |ff|
-    .fields-group
-      = ff.input :show_application, wrapper: :with_label
+    - if current_user.can?(:create_statuses)
+      .fields-group
+        = ff.input :show_application, wrapper: :with_label
 
   .actions
     = f.button :button, t('generic.save_changes'), type: :submit
