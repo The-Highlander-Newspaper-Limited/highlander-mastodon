@@ -35,7 +35,7 @@ class ManifestSerializer < ActiveModel::Serializer
         src: src || frontend_asset_url("icons/android-chrome-#{size}x#{size}.png"),
         sizes: "#{size}x#{size}",
         type: 'image/png',
-        purpose: 'any maskable',
+        purpose: 'any',
       }
     end
   end
@@ -92,7 +92,7 @@ class ManifestSerializer < ActiveModel::Serializer
   end
 
   def prefer_related_applications
-    true
+    false
   end
 
   def related_applications
