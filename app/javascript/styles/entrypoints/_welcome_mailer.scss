@@ -1,0 +1,70 @@
+@use '../mastodon/variables' as *;
+
+.email-body-padding-top-0 {
+  padding-top: 0;
+}
+
+.email-welcome-step-card {
+  margin-bottom: 16px;
+}
+
+.email-welcome-step-title {
+  margin: 0 0 8px;
+  color: $ui-base-color;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.email-welcome-step-subtitle {
+  margin: 0 0 8px;
+  color: $ui-base-color;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.email-welcome-step-body {
+  color: $ui-base-color;
+}
+
+.email-welcome-step-image {
+  display: block;
+  width: 100%;
+  border: 1px solid $grey-100;
+  border-radius: 12px;
+}
+
+.email-welcome-callout-table {
+  margin-bottom: 16px;
+}
+
+.email-welcome-callout-td {
+  background: $ui-secondary-color;
+  border-left: 3px solid $red-500;
+  border-radius: 4px;
+  padding: 10px 14px;
+}
+
+.email-welcome-callout-p {
+  margin: 0;
+  color: $ui-base-color;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.email-welcome-list {
+  margin: 0 0 16px 20px;
+  padding: 0;
+  color: $ui-base-color;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.email-welcome-list-tight {
+  margin-bottom: 0;
+}
+
+.email-welcome-list-item {
+  margin-bottom: 8px;
+}

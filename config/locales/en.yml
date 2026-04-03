@@ -2127,12 +2127,16 @@ en:
       apps_ios_action: Download on the App Store
       apps_step: Download our official apps.
       apps_title: Mastodon apps
+      categories:
+        body: All categories are selected by default. Use the toggle switches to turn off any categories you don't wish to follow.
+        image_alt: Category toggle switches
+        title: Choose your categories
       checklist_subtitle: 'Let''s get you started on this new social frontier:'
       checklist_title: Welcome Checklist
       edit_profile_action: Personalize
       edit_profile_step: Boost your interactions by having a comprehensive profile.
       edit_profile_title: Personalize your profile
-      explanation: Here are some tips to get you started
+      explanation: Everything local in one trusted place.
       feature_action: Learn more
       feature_audience: Mastodon provides you with a unique possibility of managing your audience without middlemen. Mastodon deployed on your own infrastructure allows you to follow and be followed from any other Mastodon server online and is under no one's control but yours.
       feature_audience_title: Build your audience in confidence
@@ -2154,14 +2158,39 @@ en:
       hashtags_subtitle: Explore what’s trending since past 2 days
       hashtags_title: Trending hashtags
       hashtags_view_more: View more trending hashtags
+      install:
+        android:
+          steps:
+            - Tap the three-dot menu, usually in the top-right or bottom-right corner, depending on your setup.
+            - Tap Add to Home Screen. You may also see an Install app banner at the bottom. Tap that instead if it appears.
+            - Tap Install or Add to confirm.
+          title: Android (Chrome)
+        body: Add this app to your home screen so it works just like a regular app. No app store needed.
+        iphone:
+          steps:
+            - Tap the Share button (the square with an upward arrow) at the bottom of the screen.
+            - Scroll down and tap Add to Home Screen.
+            - Change the name if you like, then tap Add.
+          title: iPhone (Safari only)
+          warning_body: The install option is not available in Chrome or Firefox on iPhone.
+          warning_title: You must use Safari.
+        title: Install the app on your phone
+      intro:
+        primary: Breaking news and community alerts when they matter.
+        secondary: The Highlander is Canadian-owned and community-focused. By using this app, you're supporting local businesses and local journalism together.
+      notifications:
+        body: Tap the bell icon next to any category to get notified when new posts are added. For example, you may want notifications for Breaking News, so you'll know right away when a highway is closed or school buses are cancelled.
+        image_alt: Bell icons for notifications
+        title: Turn on notifications
       post_action: Compose
       post_step: Say hello to the world with text, photos, videos, or polls.
       post_title: Make your first post
       share_step: Let your friends know how to find you on Mastodon.
       share_title: Share your Mastodon profile
       sign_in_action: Sign in
-      subject: Welcome to Mastodon
-      title: Welcome aboard, %{name}!
+      steps_title: "Here's some tips that will help you get started:"
+      subject: Welcome to The Highlander Community App
+      title: Welcome to The Highlander Community App!
   users:
     follow_limit_reached: You cannot follow more than %{limit} people
     go_to_sso_account_settings: Go to your identity provider's account settings

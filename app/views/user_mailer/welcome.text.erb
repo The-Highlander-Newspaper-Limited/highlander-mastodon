@@ -2,73 +2,35 @@
 
 ---
 
+<%= t('user_mailer.welcome.intro.primary') %>
+<%= t('user_mailer.welcome.intro.secondary') %>
+
 <%= t('user_mailer.welcome.sign_in_action') %>
 ===
 <%= new_user_session_url %>
 
 ---
 
-<%= t('user_mailer.welcome.checklist_title') %>
-===
-<%= t('user_mailer.welcome.checklist_subtitle') %>
+<%= t('user_mailer.welcome.steps_title') %>
 
-1. <%= t('user_mailer.welcome.edit_profile_title') %>
-   <%= t('user_mailer.welcome.edit_profile_step') %>
-   * <%= web_url('start/profile') %>
+1. <%= t('user_mailer.welcome.categories.title') %>
+   <%= t('user_mailer.welcome.categories.body') %>
+   Image: <%= frontend_asset_url('images/mailer-new/welcome/highlander-categories.png') %>
 
-2. <%= t('user_mailer.welcome.follow_title') %>
-   <%= t('user_mailer.welcome.follow_step') %>
-   * <%= web_url('start/follows') %>
+2. <%= t('user_mailer.welcome.notifications.title') %>
+   <%= t('user_mailer.welcome.notifications.body') %>
+   Image: <%= frontend_asset_url('images/mailer-new/welcome/highlander-notifications.png') %>
 
-3. <%= t('user_mailer.welcome.post_title') %>
-   <%= t('user_mailer.welcome.post_step') %>
-   * <%= web_url %>
+3. <%= t('user_mailer.welcome.install.title') %>
+   <%= t('user_mailer.welcome.install.body') %>
 
-4. <%= t('user_mailer.welcome.apps_title') %>
-   <%= t('user_mailer.welcome.apps_step') %>
-   * iOS: <%= app_store_url_ios %>
-   * Android: <%= app_store_url_android %>
+   <%= t('user_mailer.welcome.install.iphone.title') %>
+   <%= t('user_mailer.welcome.install.iphone.warning_title') %> <%= t('user_mailer.welcome.install.iphone.warning_body') %>
+<% t('user_mailer.welcome.install.iphone.steps').each.with_index(1) do |step, index| %>
+   <%= index %>. <%= step %>
+<% end %>
 
----
-
-<%= t('user_mailer.welcome.follows_title') %>
-===
-<%= t('user_mailer.welcome.follows_subtitle') %>
-
-<%- @suggestions.each do |suggestion| %>
-* <%= suggestion.account.display_name.presence || suggestion.account.username %> · @<%= suggestion.account.pretty_acct %>
-  <%= web_url("@#{suggestion.account.acct}") %>
-<%- end %>
-
-<%= web_url('explore/suggestions') %>
-
----
-
-<%= t('user_mailer.welcome.hashtags_title') %>
-===
-<%= t('user_mailer.welcome.hashtags_subtitle') %>
-
-<%- @tags.each do |tag| %>
-* #<%= tag.display_name %> · <%= recent_tag_usage(tag) %>
-  <%= tag_url(tag) %>
-<%- end %>
-
-<%= web_url('explore/tags') %>
-
----
-
-<%= t('user_mailer.welcome.feature_control_title') %>
-===
-<%= word_wrap t('user_mailer.welcome.feature_control') %>
-
-<%= t('user_mailer.welcome.feature_audience_title') %>
-===
-<%= word_wrap t('user_mailer.welcome.feature_audience') %>
-
-<%= t('user_mailer.welcome.feature_moderation_title') %>
-===
-<%= word_wrap t('user_mailer.welcome.feature_moderation') %>
-
-<%= t('user_mailer.welcome.feature_creativity_title') %>
-===
-<%= word_wrap t('user_mailer.welcome.feature_creativity') %>
+   <%= t('user_mailer.welcome.install.android.title') %>
+<% t('user_mailer.welcome.install.android.steps').each.with_index(1) do |step, index| %>
+   <%= index %>. <%= step %>
+<% end %>
