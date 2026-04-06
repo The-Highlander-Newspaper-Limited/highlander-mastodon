@@ -830,7 +830,7 @@ en:
     settings:
       about:
         manage_rules: Manage server rules
-        preamble: Provide in-depth information about how the server is operated, moderated, funded.
+        preamble: Manage what public moderation information is shown, add a status page link, and update your server terms.
         rules_hint: There is a dedicated area for rules that your users are expected to adhere to.
         title: About
       allow_referrer_origin:

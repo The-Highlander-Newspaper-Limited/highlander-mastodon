@@ -12,16 +12,17 @@ RSpec.describe 'Admin::Settings::About' do
     expect(page)
       .to have_title(I18n.t('admin.settings.about.title'))
 
-    fill_in extended_description_field,
-            with: 'new site description'
+    fill_in site_terms_field,
+            with: 'Updated terms for Highlander'
 
-    click_on submit_button
+    expect { click_on submit_button }
+      .to change(Setting, :site_terms).to('Updated terms for Highlander')
 
     expect(page)
       .to have_content(success_message)
   end
 
-  def extended_description_field
-    form_label 'form_admin_settings.site_extended_description'
+  def site_terms_field
+    form_label 'form_admin_settings.site_terms'
   end
 end

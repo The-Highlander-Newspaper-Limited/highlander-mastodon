@@ -1,5 +1,6 @@
 @use 'variables' as *;
 @use 'functions' as *;
+@use 'about_highlander';
 
 $maximum-width: 1235px;
 $fluid-breakpoint: $maximum-width + 20px;

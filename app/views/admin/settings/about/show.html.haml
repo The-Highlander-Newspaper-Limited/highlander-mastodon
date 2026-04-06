@@ -10,16 +10,6 @@
 
   %p.lead= t('admin.settings.about.preamble')
 
-  .fields-group
-    = f.input :site_extended_description,
-              as: :text,
-              input_html: { rows: 8 },
-              wrapper: :with_block_label
-
-    %p.hint
-      = t 'admin.settings.about.rules_hint'
-      = link_to t('admin.settings.about.manage_rules'), admin_rules_path
-
   .fields-row
     .fields-row__column.fields-row__column-6.fields-group
       = f.input :show_domain_blocks,
