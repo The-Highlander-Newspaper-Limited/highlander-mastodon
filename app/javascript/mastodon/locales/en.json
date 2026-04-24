@@ -318,6 +318,8 @@
   "dismissable_banner.community_timeline": "These are the most recent public posts from people whose accounts are hosted by {domain}.",
   "dismissable_banner.dismiss": "Dismiss",
   "dismissable_banner.public_timeline": "These are the most recent public posts from people on the fediverse that people on {domain} follow.",
+  "pwa_install_prompt.install.action": "Install the app",
+  "pwa_install_prompt.install.message": "Install The Highlander app for faster access and a native-like experience.",
   "domain_block_modal.block": "Block server",
   "domain_block_modal.block_account_instead": "Block @{name} instead",
   "domain_block_modal.they_can_interact_with_old_posts": "People from this server can interact with your old posts.",

@@ -2,6 +2,7 @@
 @use 'variables' as *;
 @use 'functions' as *;
 @use 'mixins' as *;
+@use 'pwa_install_prompt';
 
 .app-body {
   -webkit-overflow-scrolling: touch;
