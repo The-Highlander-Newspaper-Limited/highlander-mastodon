@@ -236,6 +236,7 @@ namespace :api, format: false do
 
     resources :followed_tags, only: [:index]
 
+    resources :categories, only: [:index]
     resources :category_filters, only: [:index, :create, :destroy]
     resources :category_notifications, only: [:index, :create, :destroy]
 

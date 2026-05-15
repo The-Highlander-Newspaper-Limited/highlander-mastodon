@@ -96,12 +96,20 @@
     border: 1px solid transparent;
   }
 
-  &__toggle {
+  &__control,
+  &__content {
     display: flex;
     align-items: center;
     gap: 12px;
     flex: 1;
+  }
+
+  &__control {
     cursor: pointer;
+  }
+
+  &__content {
+    cursor: default;
   }
 
   &__notify {

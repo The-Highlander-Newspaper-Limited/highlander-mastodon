@@ -4,14 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
-
 import Toggle from 'react-toggle';
 
 import ChevronRightIcon from '@/material-icons/400-24px/chevron_right.svg?react';
 import ExpandMoreIcon from '@/material-icons/400-24px/expand_more.svg?react';
 import NotificationsIcon from '@/material-icons/400-24px/notifications.svg?react';
 import NotificationsActiveIcon from '@/material-icons/400-24px/notifications_active-fill.svg?react';
+import { fetchCategories } from 'mastodon/actions/categories';
 import {
   addCategoryFilter,
   fetchCategoryFilters,
@@ -31,15 +30,25 @@ import { CircularProgress } from 'mastodon/components/circular_progress';
 import { Icon } from 'mastodon/components/icon';
 import { IconButton } from 'mastodon/components/icon_button';
 import { me } from 'mastodon/initial_state';
-import type { Account } from 'mastodon/models/account';
 import type { AccountCategory } from 'mastodon/models/account_categories';
-import type { Status } from 'mastodon/models/status';
 import {
-  createAppSelector,
-  useAppDispatch,
-  useAppSelector,
-} from 'mastodon/store';
-import type { RootState } from 'mastodon/store/store';
+  selectBrowserPermission,
+  selectBrowserSupport,
+  selectCategories,
+  selectCategoriesLoaded,
+  selectCategoriesLoading,
+  selectFiltersLoaded,
+  selectFiltersLoading,
+  selectFiltersSaving,
+  selectHiddenCategories,
+  selectNotificationCategories,
+  selectNotificationsLoaded,
+  selectNotificationsLoading,
+  selectNotificationsSaving,
+  selectPushStatusEnabled,
+  selectPushSubscribed,
+} from 'mastodon/selectors/category_filters';
+import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 const messages = defineMessages({
   title: {
@@ -60,12 +69,15 @@ const messages = defineMessages({
   },
   empty: {
     id: 'home.category_filters.empty',
-    defaultMessage:
-      'Categories will appear here once the accounts you follow are categorized.',
+    defaultMessage: 'No categories are available yet.',
   },
   loading: {
     id: 'home.category_filters.loading',
     defaultMessage: 'Loading categories...',
+  },
+  alwaysOn: {
+    id: 'home.category_filters.always_on',
+    defaultMessage: 'Always showing',
   },
   on: {
     id: 'home.category_filters.on',
@@ -89,159 +101,20 @@ const messages = defineMessages({
   },
   pushUnavailable: {
     id: 'home.category_filters.push_unavailable',
-    defaultMessage: 'Push permission will be requested if needed',
+    defaultMessage:
+      'Enable notifications for {category}. Browser permission may be requested.',
   },
 });
-
-const selectHomeCategories = createAppSelector(
-  [
-    (state: RootState) =>
-      (state as unknown as ImmutableMap<string, unknown>).getIn([
-        'timelines',
-        'home',
-        'items',
-      ]) as ImmutableList<string | null> | undefined,
-    (state: RootState) =>
-      (state as unknown as ImmutableMap<string, unknown>).get('statuses') as
-        | ImmutableMap<string, Status>
-        | undefined,
-    (state: RootState) =>
-      (state as unknown as ImmutableMap<string, unknown>).get('accounts') as
-        | ImmutableMap<string, Account>
-        | undefined,
-    (state: RootState) =>
-      (state as unknown as ImmutableMap<string, unknown>).getIn([
-        'category_filters',
-        'items',
-      ]) as ImmutableMap<string, AccountCategory> | undefined,
-  ],
-  (statusIds, statuses, accounts, hiddenCategories) => {
-    const categories = new Map<string, AccountCategory>();
-
-    hiddenCategories?.forEach((category, categoryId) => {
-      categories.set(categoryId, category);
-    });
-
-    statusIds?.forEach((statusId) => {
-      if (!statusId) return;
-
-      const status = statuses?.get(statusId);
-      if (!status) return;
-
-      const accountId = status.get('account') as string | undefined;
-      const reblogId = status.get('reblog') as string | undefined;
-      const account = accountId ? accounts?.get(accountId) : null;
-      const reblogAccount =
-        reblogId && statuses
-          ? accounts?.get(statuses.getIn([reblogId, 'account']) as string)
-          : null;
-
-      [account, reblogAccount].filter(Boolean).forEach((statusAccount) => {
-        const statusCategories = statusAccount?.get('categories');
-
-        statusCategories?.forEach((category) => {
-          const categoryId = getCategoryId(category);
-          if (!categoryId) return;
-
-          if (!categories.has(categoryId)) {
-            categories.set(categoryId, category);
-          }
-        });
-      });
-    });
-
-    return Array.from(categories.values()).sort((a, b) => {
-      const aMandatory = a.get('mandatory_for_readers') ? 1 : 0;
-      const bMandatory = b.get('mandatory_for_readers') ? 1 : 0;
-
-      if (aMandatory !== bMandatory) {
-        return bMandatory - aMandatory;
-      }
-
-      return a.get('name').localeCompare(b.get('name'));
-    });
-  },
-);
 
 const getCategoryId = (category: AccountCategory) =>
   category.get('id') || category.get('name');
 
-const selectHiddenCategories = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn([
-    'category_filters',
-    'items',
-  ]) as ImmutableMap<string, AccountCategory> | undefined;
-
-const selectIsLoading = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn(
-    ['category_filters', 'isLoading'],
-    false,
-  ) as boolean;
-
-const selectIsLoaded = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn(
-    ['category_filters', 'loaded'],
-    false,
-  ) as boolean;
-
-const selectSaving = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn([
-    'category_filters',
-    'saving',
-  ]) as ImmutableMap<string, boolean> | undefined;
-
-const selectNotificationCategories = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn([
-    'category_notifications',
-    'items',
-  ]) as ImmutableMap<string, AccountCategory> | undefined;
-
-const selectNotificationsLoading = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn(
-    ['category_notifications', 'isLoading'],
-    false,
-  ) as boolean;
-
-const selectNotificationsLoaded = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn(
-    ['category_notifications', 'loaded'],
-    false,
-  ) as boolean;
-
-const selectNotificationsSaving = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn([
-    'category_notifications',
-    'saving',
-  ]) as ImmutableMap<string, boolean> | undefined;
-
-const selectPushSubscribed = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn(
-    ['push_notifications', 'isSubscribed'],
-    false,
-  ) as boolean;
-
-const selectPushStatusEnabled = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn(
-    ['push_notifications', 'alerts', 'status'],
-    false,
-  ) as boolean;
-
-const selectBrowserSupport = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn(
-    ['notifications', 'browserSupport'],
-    false,
-  ) as boolean;
-
-const selectBrowserPermission = (state: RootState) =>
-  (state as unknown as ImmutableMap<string, unknown>).getIn(
-    ['notifications', 'browserPermission'],
-    'default',
-  ) as string;
-
 interface CategoryFiltersDataParams {
   dispatch: ReturnType<typeof useAppDispatch>;
-  isLoaded: boolean;
-  isLoading: boolean;
+  isCategoriesLoaded: boolean;
+  isCategoriesLoading: boolean;
+  areFiltersLoaded: boolean;
+  areFiltersLoading: boolean;
   isNotificationsLoaded: boolean;
   isNotificationsLoading: boolean;
   categoriesLength: number;
@@ -249,17 +122,25 @@ interface CategoryFiltersDataParams {
 
 const useCategoryFiltersData = ({
   dispatch,
-  isLoaded,
-  isLoading,
+  isCategoriesLoaded,
+  isCategoriesLoading,
+  areFiltersLoaded,
+  areFiltersLoading,
   isNotificationsLoaded,
   isNotificationsLoading,
   categoriesLength,
 }: CategoryFiltersDataParams) => {
   useEffect(() => {
-    if (!isLoaded && me) {
+    if (!isCategoriesLoaded && me) {
+      void dispatch(fetchCategories());
+    }
+  }, [dispatch, isCategoriesLoaded]);
+
+  useEffect(() => {
+    if (!areFiltersLoaded && me) {
       void dispatch(fetchCategoryFilters());
     }
-  }, [dispatch, isLoaded]);
+  }, [dispatch, areFiltersLoaded]);
 
   useEffect(() => {
     if (!isNotificationsLoaded && me) {
@@ -268,8 +149,10 @@ const useCategoryFiltersData = ({
   }, [dispatch, isNotificationsLoaded]);
 
   return (
-    (!isLoaded ||
-      isLoading ||
+    (!isCategoriesLoaded ||
+      isCategoriesLoading ||
+      !areFiltersLoaded ||
+      areFiltersLoading ||
       !isNotificationsLoaded ||
       isNotificationsLoading) &&
     categoriesLength === 0
@@ -302,37 +185,46 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
   onNotifyToggle,
 }) => {
   const categoryId = getCategoryId(category);
+  const stateMessage = isMandatory
+    ? messages.alwaysOn
+    : isHidden
+      ? messages.off
+      : messages.on;
+
+  const categoryLabel = (
+    <div className='home-category-filters__label'>
+      <span className='home-category-filters__name'>
+        {category.get('name')}
+      </span>
+
+      <div className='home-category-filters__meta'>
+        <span className='home-category-filters__state'>
+          <FormattedMessage {...stateMessage} />
+        </span>
+      </div>
+    </div>
+  );
 
   return (
     <div className='home-category-filters__item'>
-      <label
-        htmlFor={`home-category-filter-${categoryId}`}
-        className='home-category-filters__toggle'
-      >
-        <Toggle
-          id={`home-category-filter-${categoryId}`}
-          checked={!isHidden}
-          disabled={isSaving || isMandatory}
-          onChange={onToggleChange}
-          aria-label={toggleAriaLabel}
-        />
+      {isMandatory ? (
+        <div className='home-category-filters__content'>{categoryLabel}</div>
+      ) : (
+        <label
+          htmlFor={`home-category-filter-${categoryId}`}
+          className='home-category-filters__control'
+        >
+          <Toggle
+            id={`home-category-filter-${categoryId}`}
+            checked={!isHidden}
+            disabled={isSaving}
+            onChange={onToggleChange}
+            aria-label={toggleAriaLabel}
+          />
 
-        <div className='home-category-filters__label'>
-          <span className='home-category-filters__name'>
-            {category.get('name')}
-          </span>
-
-          <div className='home-category-filters__meta'>
-            <span className='home-category-filters__state'>
-              {isHidden ? (
-                <FormattedMessage {...messages.off} />
-              ) : (
-                <FormattedMessage {...messages.on} />
-              )}
-            </span>
-          </div>
-        </div>
-      </label>
+          {categoryLabel}
+        </label>
+      )}
 
       <IconButton
         className='home-category-filters__notify'
@@ -357,7 +249,9 @@ const getNotifyTitle = (
   browserPermission: string,
 ) => {
   if (!isNotifyEnabled && browserSupport && browserPermission !== 'granted') {
-    return intl.formatMessage(messages.pushUnavailable);
+    return intl.formatMessage(messages.pushUnavailable, {
+      category: categoryName,
+    });
   }
 
   return intl.formatMessage(
@@ -371,11 +265,13 @@ export const CategoryFilters: React.FC = () => {
   const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
 
-  const categories = useAppSelector(selectHomeCategories);
+  const categories = useAppSelector(selectCategories);
+  const isCategoriesLoading = useAppSelector(selectCategoriesLoading);
+  const isCategoriesLoaded = useAppSelector(selectCategoriesLoaded);
   const hiddenCategories = useAppSelector(selectHiddenCategories);
-  const isLoading = useAppSelector(selectIsLoading);
-  const isLoaded = useAppSelector(selectIsLoaded);
-  const saving = useAppSelector(selectSaving);
+  const areFiltersLoading = useAppSelector(selectFiltersLoading);
+  const areFiltersLoaded = useAppSelector(selectFiltersLoaded);
+  const filtersSaving = useAppSelector(selectFiltersSaving);
   const notificationCategories = useAppSelector(selectNotificationCategories);
   const isNotificationsLoading = useAppSelector(selectNotificationsLoading);
   const isNotificationsLoaded = useAppSelector(selectNotificationsLoaded);
@@ -384,14 +280,20 @@ export const CategoryFilters: React.FC = () => {
   const pushStatusEnabled = useAppSelector(selectPushStatusEnabled);
   const browserSupport = useAppSelector(selectBrowserSupport);
   const browserPermission = useAppSelector(selectBrowserPermission);
+  const categoryItems = useMemo(
+    () => categories?.toArray() ?? [],
+    [categories],
+  );
 
   const isStillLoading = useCategoryFiltersData({
     dispatch,
-    isLoaded,
-    isLoading,
+    isCategoriesLoaded,
+    isCategoriesLoading,
+    areFiltersLoaded,
+    areFiltersLoading,
     isNotificationsLoaded,
     isNotificationsLoading,
-    categoriesLength: categories.length,
+    categoriesLength: categoryItems.length,
   });
 
   useEffect(() => {
@@ -459,7 +361,7 @@ export const CategoryFilters: React.FC = () => {
     ],
   );
 
-  const renderBody = useMemo(() => {
+  const renderBody = () => {
     if (isStillLoading) {
       return (
         <div className='home-category-filters__loading'>
@@ -469,7 +371,7 @@ export const CategoryFilters: React.FC = () => {
       );
     }
 
-    if (!categories.length) {
+    if (!categoryItems.length) {
       return (
         <p className='home-category-filters__empty'>
           <FormattedMessage {...messages.empty} />
@@ -479,13 +381,13 @@ export const CategoryFilters: React.FC = () => {
 
     return (
       <div className='home-category-filters__list'>
-        {categories.map((category) => {
+        {categoryItems.map((category) => {
           const categoryId = getCategoryId(category);
           const categoryName = category.get('name');
           const isMandatory = category.get('mandatory_for_readers');
           const isHidden =
             !isMandatory && Boolean(hiddenCategories?.has(categoryId));
-          const isSaving = Boolean(saving?.get(categoryId));
+          const isSaving = Boolean(filtersSaving?.get(categoryId));
           const isNotifySaving = Boolean(notificationsSaving?.get(categoryId));
           const isNotifyEnabled = Boolean(
             notificationCategories?.has(categoryId),
@@ -519,19 +421,7 @@ export const CategoryFilters: React.FC = () => {
         })}
       </div>
     );
-  }, [
-    browserPermission,
-    browserSupport,
-    categories,
-    handleNotificationToggle,
-    handleToggleChange,
-    hiddenCategories,
-    intl,
-    notificationCategories,
-    notificationsSaving,
-    saving,
-    isStillLoading,
-  ]);
+  };
 
   if (!me) return null;
 
@@ -562,7 +452,7 @@ export const CategoryFilters: React.FC = () => {
         </span>
       </button>
 
-      {expanded && renderBody}
+      {expanded && renderBody()}
     </div>
   );
 };

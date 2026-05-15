@@ -3,6 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe 'API routes' do
+  describe 'Category routes' do
+    it 'routes index' do
+      expect(get('/api/v1/categories'))
+        .to route_to('api/v1/categories#index')
+    end
+  end
+
   describe 'Category filters routes' do
     it 'routes index' do
       expect(get('/api/v1/category_filters'))
