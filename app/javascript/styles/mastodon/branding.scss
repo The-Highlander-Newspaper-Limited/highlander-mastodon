@@ -3,38 +3,3 @@
 .logo {
   color: $primary-text-color;
 }
-
-// (possible) TODO: refactor to use svg inline with css for colors (to reduce the changes diff)
-.logo--img {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo__img {
-  display: block;
-  height: 100%;
-  width: auto;
-}
-
-.logo__img--dark {
-  display: none;
-}
-
-body:is(.theme-default, .theme-contrast) .logo__img--light {
-  display: none;
-}
-
-body:is(.theme-default, .theme-contrast) .logo__img--dark {
-  display: block;
-}
-
-@media (prefers-color-scheme: dark) {
-  body.theme-system .logo__img--light {
-    display: none;
-  }
-
-  body.theme-system .logo__img--dark {
-    display: block;
-  }
-}

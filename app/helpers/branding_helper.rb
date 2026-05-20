@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module BrandingHelper
-  include ThemedLogoHelper # (possible) TODO: refactor to use svg inline with css for colors (to reduce the changes diff)
-
   def logo_as_symbol(version = :icon)
     case version
     when :icon
@@ -13,14 +11,14 @@ module BrandingHelper
   end
 
   def _logo_as_symbol_wordmark
-    themed_logo('logo--wordmark')
+    content_tag(:svg, tag.use(href: '#logo-symbol-wordmark'), viewBox: '0 0 261 66', class: 'logo logo--wordmark')
   end
 
   def _logo_as_symbol_icon
-    themed_logo('logo--icon')
+    content_tag(:svg, tag.use(href: '#logo-symbol-icon'), viewBox: '0 0 79 79', class: 'logo logo--icon')
   end
 
   def render_logo
-    logo_as_symbol(:icon)
+    image_tag(frontend_asset_path('images/logo.svg'), alt: 'Mastodon', class: 'logo logo--icon')
   end
 end
