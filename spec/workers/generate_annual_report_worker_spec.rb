@@ -6,22 +6,15 @@ RSpec.describe GenerateAnnualReportWorker do
   let(:worker) { described_class.new }
   let(:account) { Fabricate :account }
 
+  # highlander: annual report feature disabled on this fork; the worker is a no-op.
   describe '#perform' do
-    it 'generates new report for the account' do
+    it 'does not generate a report for the account' do
       expect { worker.perform(account.id, Date.current.year) }
-        .to change(account_reports, :count).by(1)
+        .to not_change(GeneratedAnnualReport, :count)
     end
 
-    it 'returns true for non-existent record' do
-      result = worker.perform(123_123_123, Date.current.year)
-
-      expect(result).to be(true)
-    end
-
-    def account_reports
-      GeneratedAnnualReport
-        .where(account: account)
-        .where(year: Date.current.year)
+    it 'does not raise for a non-existent account' do
+      expect { worker.perform(123_123_123, Date.current.year) }.to_not raise_error
     end
   end
 end
