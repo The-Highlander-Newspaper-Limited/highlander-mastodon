@@ -1,81 +1,105 @@
-> [!NOTE]
-> Want to learn more about Mastodon?
-> Click below to find out more in a video.
+# The Highlander Community App
 
 <p align="center">
-  <a style="text-decoration:none" href="https://www.youtube.com/watch?v=IPSbNdBmWKE">
-    <img alt="Mastodon hero image" src="https://github.com/user-attachments/assets/ef53f5e9-c0d8-484d-9f53-00efdebb92c3" />
-  </a>
+  <img alt="The Highlander logo" src="./app/javascript/images/logo-symbol-wordmark.svg?raw=true" width="360" />
 </p>
 
-<p align="center">
-  <a style="text-decoration:none" href="https://github.com/mastodon/mastodon/releases">
-    <img src="https://img.shields.io/github/release/mastodon/mastodon.svg" alt="Release" /></a>
-  <a style="text-decoration:none" href="https://github.com/mastodon/mastodon/actions/workflows/test-ruby.yml">
-    <img src="https://github.com/mastodon/mastodon/actions/workflows/test-ruby.yml/badge.svg" alt="Ruby Testing" /></a>
-  <a style="text-decoration:none" href="https://crowdin.com/project/mastodon">
-    <img src="https://d322cqt584bo4o.cloudfront.net/mastodon/localized.svg" alt="Crowdin" /></a>
-</p>
+The Highlander is a local community app built on Mastodon. It keeps Mastodon's
+open-source server foundation, moderation tools, media handling, OAuth2, and
+REST/Streaming APIs, while adapting the product for an unfederated local news
+and community-reading experience.
 
-Mastodon is a **free, open-source social network server** based on [ActivityPub](https://www.w3.org/TR/activitypub/) where users can follow friends and discover new ones. On Mastodon, users can publish anything they want: links, pictures, text, and video. All Mastodon servers are interoperable as a federated network (users on one server can seamlessly communicate with users from another one, including non-Mastodon software that implements ActivityPub!)
+This repository contains the Highlander Mastodon fork used by
+[thehighlander.app](https://thehighlander.app).
 
-## Navigation
+## What Highlander changes
 
-- [Project homepage 🐘](https://joinmastodon.org)
-- [Donate to support development 🎁](https://joinmastodon.org/sponsors#donate)
-  - [View sponsors](https://joinmastodon.org/sponsors)
-- [Blog 📰](https://blog.joinmastodon.org)
-- [Documentation 📚](https://docs.joinmastodon.org)
-- [Official container image 🚢](https://github.com/mastodon/mastodon/pkgs/container/mastodon)
+- **All-reader home feed**: public posts are delivered to active readers instead
+  of relying only on the follow graph.
+- **Unfederated app model**: Highlander does not use Mastodon federation or
+  ActivityPub-facing network behavior.
+- **Installable PWA**: Highlander can be installed from the browser for a
+  native-like mobile experience without an app store.
+- **Content categories**: accounts can be assigned categories, and category
+  badges appear in status and admin views.
+- **Reader category filters**: readers can turn optional categories on or off in
+  their home feed.
+- **Category notifications**: readers can opt into push notifications for
+  selected categories.
+- **Highlander roles**: the fork adds a `Poster` role to the starter roles and category-management
+  permissions for admins.
+- **Highlander onboarding and branding**: welcome flows, email copy, themes, and
+  public-facing text are customized for The Highlander.
 
-## Features
+For implementation details and maintainer notes, read
+[Highlander features](docs/HIGHLANDER_FEATURES.md).
 
-<img src="./app/javascript/images/elephant_ui_working.svg?raw=true" align="right" width="30%" />
+## Documentation
 
-**Part of the Fediverse. Based on open standards, with no vendor lock-in.** - the network goes beyond just Mastodon; anything that implements ActivityPub is part of a broader social network known as [the Fediverse](https://jointhefediverse.net/). You can follow and interact with users on other servers (including those running different software), and they can follow you back.
+- [Highlander features](docs/HIGHLANDER_FEATURES.md): Highlander-specific product
+  behavior, API endpoints, roles, feed changes, and focused specs.
+- [Development setup](docs/DEVELOPMENT.md): local development environment
+  setup.
+- [Operations notes](docs/OPERATIONS.md): Highlander-specific production
+  recovery notes, including Elestio 502 recovery.
+- [Contributing](CONTRIBUTING.md): upstream contribution guidance that still
+  applies to most code-level changes.
+- [Security policy](SECURITY.md): reporting security issues.
 
-**Real-time, chronological timeline updates** - updates of people you're following appear in real-time in the UI.
+For upstream Mastodon administration and deployment concepts, refer to the
+[Mastodon documentation](https://docs.joinmastodon.org). Some branding and
+product behavior in this repository intentionally differs from upstream.
 
-**Media attachments** - upload and view images and videos attached to the updates. Videos with no audio track are treated like animated GIFs; normal videos loop continuously.
+## Tech stack
 
-**Safety and moderation tools** - Mastodon includes private posts, locked accounts, phrase filtering, muting, blocking, and many other features, along with a reporting and moderation system.
-
-**OAuth2 and a straightforward REST API** - Mastodon acts as an OAuth2 provider, and third party apps can use the REST and Streaming APIs. This results in a [rich app ecosystem](https://joinmastodon.org/apps) with a variety of choices!
-
-## Deployment
-
-### Tech stack
-
-- [Ruby on Rails](https://github.com/rails/rails) powers the REST API and other web pages.
-- [PostgreSQL](https://www.postgresql.org/) is the main database.
-- [Redis](https://redis.io/) and [Sidekiq](https://sidekiq.org/) are used for caching and queueing.
+- [Ruby on Rails](https://github.com/rails/rails) powers the web app, REST API,
+  admin UI, and background jobs.
+- [PostgreSQL](https://www.postgresql.org/) is the primary database.
+- [Redis](https://redis.io/) and [Sidekiq](https://sidekiq.org/) handle caching,
+  feeds, and job processing.
 - [Node.js](https://nodejs.org/) powers the streaming API.
-- [React.js](https://reactjs.org/) and [Redux](https://redux.js.org/) are used for the dynamic parts of the interface.
-- [BrowserStack](https://www.browserstack.com/) supports testing on real devices and browsers. (This project is tested with BrowserStack)
-- [Chromatic](https://www.chromatic.com/) provides visual regression testing. (This project is tested with Chromatic)
+- [React](https://react.dev/) and [Redux](https://redux.js.org/) power the
+  interactive frontend.
 
-### Requirements
+## Requirements
 
-- **Ruby** 3.2+
-- **PostgreSQL** 14+
-- **Redis** 7.0+
-- **Node.js** 20+
+- Ruby 3.2+
+- PostgreSQL 14+
+- Redis 7.0+
+- Node.js 20+
 
-This repository includes deployment configurations for **Docker and docker-compose**, as well as for other environments like Heroku and Scalingo. For Helm charts, reference the [mastodon/chart repository](https://github.com/mastodon/chart). A [**standalone** installation guide](https://docs.joinmastodon.org/admin/install/) is available in the main documentation.
+## Development
 
-## Contributing
+Set up a local development environment with [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+PWA testing needs a production-mode local run behind HTTPS; see
+[Testing the PWA](docs/DEVELOPMENT.md#testing-the-pwa).
 
-Mastodon is **free, open-source software** licensed under **AGPLv3**. We welcome contributions and help from anyone who wants to improve the project.
+Common commands:
 
-You should read the overall [CONTRIBUTING](https://github.com/mastodon/.github/blob/main/CONTRIBUTING.md) guide, which covers our development processes.
+```shell
+bin/setup
+bin/dev
+bin/rspec
+yarn test
+```
 
-You should also read and understand the [CODE OF CONDUCT](https://github.com/mastodon/.github/blob/main/CODE_OF_CONDUCT.md) that enables us to maintain a welcoming and inclusive community. Collaboration begins with mutual respect and understanding.
+After setup, the local app is available at `http://localhost:3000`. The default
+development admin account is `admin@mastodon.local` or `admin@localhost`,
+depending on setup, with password `mastodonadmin`.
 
-You can learn about setting up a development environment in the [DEVELOPMENT](docs/DEVELOPMENT.md) documentation.
+## Upstream base
 
-If you would like to help with translations 🌐 you can do so on [Crowdin](https://crowdin.com/project/mastodon).
+The Highlander is based on Mastodon, a free, open-source social network server
+licensed under AGPLv3. Mastodon provides much of the core server, moderation,
+API, and frontend infrastructure, but Highlander is operated as an unfederated
+application.
 
-## LICENSE
+Useful upstream links:
+
+- [Mastodon project](https://github.com/mastodon/mastodon)
+- [Mastodon documentation](https://docs.joinmastodon.org)
+
+## License
 
 Copyright (c) 2016-2025 Eugen Rochko (+ [`mastodon authors`](AUTHORS.md))
 

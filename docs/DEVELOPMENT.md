@@ -95,6 +95,83 @@ development environment configured with the software needed for this project.
 - Check out the [Mastodon docs] for tips on working with emails in development (you'll need this when creating new user accounts) as well as a list of useful commands for testing and updating your dev instance.
 - You can optionally populate your database with sample data by running `bin/rails dev:populate_sample_data`. This will create a `@showcase_account` account with various types of contents.
 
+## Testing the PWA
+
+For normal feature work, use `bin/dev`. For PWA install, service worker, and
+push-notification testing, run the production Docker setup locally and open it
+through an HTTPS URL. A local `http://localhost:3000` development server does
+not exercise the same production assets and service worker path.
+
+Use an HTTPS tunnel such as Cotunnel to expose local port `3000`. Start the
+tunnel first and copy the generated HTTPS host name without the `https://`
+prefix. For example, if the tunnel URL is
+`https://highlander-dev.cotunnel.com`, use `highlander-dev.cotunnel.com` as
+`LOCAL_DOMAIN` and `WEB_DOMAIN`.
+
+Create or update `.env.production` for the local Docker run. Use the tunnel host
+and the Docker service names from `docker-compose.yml`:
+
+```shell
+LOCAL_DOMAIN=highlander-dev.cotunnel.com
+WEB_DOMAIN=highlander-dev.cotunnel.com
+
+DB_HOST=db
+DB_USER=postgres
+DB_NAME=mastodon_production
+DB_PASS=
+DB_PORT=5432
+REPLICA_DB_TASKS=false
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+ES_ENABLED=false
+S3_ENABLED=false
+```
+
+Keep `.env.production` local-only and do not reuse real production secrets or a
+real production database. The compose file stores local PostgreSQL, Redis, and
+uploaded media data in gitignored directories under the repository.
+
+If `.env.production` does not already have local secrets, generate them inside
+the Docker image and paste the output into `.env.production`:
+
+```shell
+docker compose build web
+docker compose run --rm web bundle exec rails secret
+docker compose run --rm web bundle exec rails mastodon:webpush:generate_vapid_key
+docker compose run --rm web bundle exec rails db:encryption:init
+```
+
+Initialize the local production-mode database:
+
+```shell
+docker compose up -d db redis
+docker compose run --rm -e SAFETY_ASSURED=1 web bundle exec rails db:setup
+```
+
+Then start the same services used by the production-style compose setup:
+
+```shell
+docker compose up --build
+```
+
+Keep the HTTPS tunnel forwarding to `http://localhost:3000`, then open the
+tunnel URL in the browser or on a mobile device. The tunnel hostname must match
+`LOCAL_DOMAIN` and `WEB_DOMAIN`; if the tunnel URL changes, update
+`.env.production`, restart Docker, and clear the browser's installed
+PWA/service worker state before retesting install behavior.
+
+The default tunnel-to-port-`3000` setup is enough for install and service worker
+testing. If you need live timeline streaming too, expose the `streaming` service
+on port `4000` through a separate HTTPS/WSS tunnel or a local reverse proxy that
+routes `/api/v1/streaming` to the streaming container. When using a separate
+streaming tunnel, set `STREAMING_API_BASE_URL` to that `wss://` URL in
+`.env.production` and restart Docker.
+
+When you change frontend code or production environment values that affect
+compiled assets, rebuild the images with `docker compose up --build`.
+
 [codespace]: https://codespaces.new/mastodon/mastodon?quickstart=1&devcontainer_path=.devcontainer%2Fcodespaces%2Fdevcontainer.json
 [CONTRIBUTING]: ../CONTRIBUTING.md
 [Dev Container extension]: https://containers.dev/supporting#dev-containers
