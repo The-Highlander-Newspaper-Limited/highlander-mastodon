@@ -112,29 +112,78 @@ Check its [current pricing](https://uptimerobot.com/pricing/) when choosing or c
 
 ## Elestio 502 recovery after Elestio update
 
-Highlander has seen 502 errors after Elestio VM update activity where
-PostgreSQL and Redis were still running, but the app containers were missing or
-stopped:
+Highlander has seen 502 errors after Elestio VM update activity where the
+reverse proxy could not reach the Rails app on port 3000. In the confirmed
+incident, PostgreSQL and Redis were running, but the locally built app
+containers were missing or not recreated:
 
 - `web`
 - `streaming`
 - `sidekiq`
 
-In that state, Docker may log messages like:
+The app images are built locally by Compose (`highlander-mastodon:web`,
+`highlander-mastodon:streaming`, and `highlander-mastodon:sidekiq`). They exist
+only on the Elestio VM unless pushed to a registry.
 
-```text
-ShouldRestart failed, container will not be restarted
-hasBeenManuallyStopped=true
-restart canceled
-```
+Elestio support identified the failure sequence as:
 
-`restart: always` does not necessarily recover a container after Docker or
-platform automation marks it as manually stopped. Elestio support identified one
-root cause as the app containers running from dangling, untagged images. Their
-fix was to take the Compose stack down and bring it back up so the app containers
-were recreated from properly tagged images.
+1. Watchtower updates a managed image such as `postgres:14-alpine`.
+2. Watchtower stops and removes dependent containers such as `web`, `streaming`,
+   and `sidekiq` so it can recreate the affected dependency tree.
+3. Elestio maintenance runs `docker image prune -a -f`.
+4. Because the app containers have been removed, their locally built images are
+   no longer referenced by running containers, so `prune -a` deletes them.
+5. Watchtower tries to recreate the app containers, but the images no longer
+   exist, producing errors like `No such image: highlander-mastodon:web`.
+6. The reverse proxy keeps forwarding traffic to port 3000, but no healthy
+   `web` container is listening, so users see 502 responses.
+
+For locally built images, Watchtower cannot query a registry to determine
+staleness. That check can fail without aborting the update run, so Watchtower
+may still remove linked containers while recreating an updated dependency.
+
+`restart: always` cannot recover from this state because the affected containers
+were removed and the images needed to recreate them were deleted.
 
 ### Prevention
+
+The production Compose file marks the locally built app containers as excluded
+from Watchtower. This is a container label, not an image label:
+
+```yaml
+labels:
+  - com.centurylinklabs.watchtower.enable=false
+```
+
+Keep that label on `web`, `streaming`, and `sidekiq`. Updates to those services
+come from the application deployment pipeline, not from Watchtower.
+
+On the Elestio VM, change `/opt/maintenance.sh` so image cleanup removes only
+dangling images:
+
+```shell
+docker image prune -f
+```
+
+Do not use this command in maintenance:
+
+```shell
+docker image prune -a -f
+```
+
+The `-a` flag removes every unused image, including locally built app images
+when their containers have been stopped or removed.
+
+This maintenance script is VM-local and is not controlled by this repository.
+Elestio support confirmed that `/opt/maintenance.sh` is not regenerated on the
+current VM, so local edits should survive normal platform automation. If the
+service is cloned or moved to another region, the new VM may get the default
+script and this change must be reapplied. After Elestio platform changes,
+verify the active cleanup command on the VM:
+
+```shell
+grep -n 'docker image prune' /opt/maintenance.sh
+```
 
 When restarting the production stack on Elestio, prefer the Elestio UI restart
 action or run Compose from the Elestio pipeline terminal. This keeps the restart
@@ -153,12 +202,47 @@ docker compose ps
 ```
 
 If only `db` and `redis` are running, or if `web`, `streaming`, or `sidekiq` are
-missing, recreate the stack from Compose:
+missing, check whether the local app image tags still exist:
+
+```shell
+docker image ls 'highlander-mastodon'
+```
+
+The expected tags are:
+
+```text
+highlander-mastodon   web
+highlander-mastodon   streaming
+highlander-mastodon   sidekiq
+```
+
+If the tags are missing, recreate the stack from Compose and rebuild the app
+images:
 
 ```shell
 docker compose down
 docker compose up -d --build
 ```
+
+After applying or changing the Watchtower labels, recreate the app containers so
+Docker applies the labels:
+
+```shell
+docker compose up -d --no-deps --force-recreate web streaming sidekiq
+```
+
+Verify the label on each app container:
+
+```shell
+docker inspect highlander-mastodon-web-1 \
+  --format '{{ index .Config.Labels "com.centurylinklabs.watchtower.enable" }}'
+docker inspect highlander-mastodon-streaming-1 \
+  --format '{{ index .Config.Labels "com.centurylinklabs.watchtower.enable" }}'
+docker inspect highlander-mastodon-sidekiq-1 \
+  --format '{{ index .Config.Labels "com.centurylinklabs.watchtower.enable" }}'
+```
+
+Each command should print `false`.
 
 If a plain Compose recreate does not fix the stale image/container state, you can
 try to run the full reset command:
