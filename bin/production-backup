@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+# Create a one-off production backup for the Docker Compose deployment.
+# Operator documentation: docs/OPERATIONS.md, "Production backup".
+set -Eeuo pipefail
+
+ROOT="${1:-$(pwd)}"
+OUT_DIR="${BACKUP_OUT:-$ROOT/backups}"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+NAME="mastodon-production-$STAMP"
+WORK_DIR="$OUT_DIR/$NAME"
+
+die() {
+  printf 'error: %s\n' "$*" >&2
+  exit 1
+}
+
+compose() {
+  if docker compose version >/dev/null 2>&1; then
+    docker compose "$@"
+  elif command -v docker-compose >/dev/null 2>&1; then
+    docker-compose "$@"
+  else
+    die "neither 'docker compose' nor 'docker-compose' is available"
+  fi
+}
+
+env_value() {
+  local key="$1"
+
+  awk -F= -v key="$key" '
+    $0 !~ /^[[:space:]]*(#|$)/ && $1 == key {
+      value = substr($0, index($0, "=") + 1)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+      gsub(/^'\''|'\''$/, "", value)
+      gsub(/^"|"$/, "", value)
+      print value
+      exit
+    }
+  ' .env.production
+}
+
+cd "$ROOT"
+
+[[ -f docker-compose.yml ]] || die "docker-compose.yml not found in $ROOT"
+[[ -f .env.production ]] || die ".env.production not found in $ROOT"
+[[ -d public/system ]] || die "public/system not found in $ROOT"
+
+mkdir -p "$WORK_DIR"
+chmod 700 "$OUT_DIR" "$WORK_DIR"
+
+DB_NAME="$(compose exec -T web printenv DB_NAME 2>/dev/null || true)"
+DB_NAME="${DB_NAME:-$(env_value DB_NAME)}"
+DB_NAME="${DB_NAME:-mastodon_production}"
+PG_DUMP_USER="${PG_DUMP_USER:-postgres}"
+
+DB_DUMP="$WORK_DIR/postgresql-$DB_NAME.dump"
+DB_GLOBALS="$WORK_DIR/postgresql-globals.sql"
+MEDIA_ARCHIVE="$WORK_DIR/public-system.tar.gz"
+SECRETS_ARCHIVE="$WORK_DIR/secrets-env-production.tar.gz"
+BULK_ARCHIVE="$OUT_DIR/$NAME-bulk.tar.gz"
+SECRETS_OUTPUT="$OUT_DIR/$NAME-secrets.tar.gz"
+MANIFEST="$WORK_DIR/manifest.txt"
+
+printf 'Creating PostgreSQL custom-format dump for database %s...\n' "$DB_NAME"
+compose exec -T db pg_dump -U "$PG_DUMP_USER" -d "$DB_NAME" -Fc > "$DB_DUMP"
+
+printf 'Creating PostgreSQL globals dump...\n'
+compose exec -T db pg_dumpall -U "$PG_DUMP_USER" --globals-only > "$DB_GLOBALS"
+
+printf 'Archiving uploaded media from %s/public/system...\n' "$ROOT"
+tar -C "$ROOT" -czf "$MEDIA_ARCHIVE" public/system
+
+printf 'Copying .env.production into a separate secrets archive...\n'
+install -m 600 .env.production "$WORK_DIR/.env.production"
+tar -C "$WORK_DIR" -czf "$SECRETS_ARCHIVE" .env.production
+chmod 600 "$SECRETS_ARCHIVE"
+
+{
+  printf 'Backup name: %s\n' "$NAME"
+  printf 'Created UTC: %s\n' "$STAMP"
+  printf 'Deploy root: %s\n' "$ROOT"
+  printf 'Database service: db\n'
+  printf 'Database name: %s\n' "$DB_NAME"
+  printf 'PostgreSQL dump format: custom pg_dump (-Fc)\n'
+  printf 'Media location on host: %s/public/system\n' "$ROOT"
+  printf 'Media location in containers: /mastodon/public/system\n'
+  printf 'Media storage mode: local filesystem, unless S3/SWIFT/AZURE variables are enabled in .env.production\n'
+  printf 'Secrets source: %s/.env.production\n' "$ROOT"
+  printf '\nRedacted .env.production keys:\n'
+  sed -E 's/=.*$/=<redacted>/' .env.production
+  printf '\nArtifact sizes:\n'
+  du -h "$DB_DUMP" "$DB_GLOBALS" "$MEDIA_ARCHIVE" "$SECRETS_ARCHIVE"
+} > "$MANIFEST"
+
+printf 'Creating bulk archive...\n'
+tar -C "$WORK_DIR" -czf "$BULK_ARCHIVE" \
+  "$(basename "$DB_DUMP")" \
+  "$(basename "$DB_GLOBALS")" \
+  "$(basename "$MEDIA_ARCHIVE")" \
+  "$(basename "$MANIFEST")"
+
+if [[ -n "${BACKUP_AGE_RECIPIENT:-}" ]]; then
+  command -v age >/dev/null 2>&1 || die "BACKUP_AGE_RECIPIENT is set but age is not installed"
+  SECRETS_OUTPUT="$OUT_DIR/$NAME-secrets.tar.gz.age"
+  age -r "$BACKUP_AGE_RECIPIENT" -o "$SECRETS_OUTPUT" "$SECRETS_ARCHIVE"
+elif [[ -n "${BACKUP_GPG_RECIPIENT:-}" ]]; then
+  command -v gpg >/dev/null 2>&1 || die "BACKUP_GPG_RECIPIENT is set but gpg is not installed"
+  SECRETS_OUTPUT="$OUT_DIR/$NAME-secrets.tar.gz.gpg"
+  gpg --batch --yes --encrypt --recipient "$BACKUP_GPG_RECIPIENT" --output "$SECRETS_OUTPUT" "$SECRETS_ARCHIVE"
+else
+  cp "$SECRETS_ARCHIVE" "$SECRETS_OUTPUT"
+fi
+chmod 600 "$SECRETS_OUTPUT"
+
+printf 'Writing checksums...\n'
+(
+  cd "$OUT_DIR"
+  sha256sum "$(basename "$BULK_ARCHIVE")" "$(basename "$SECRETS_OUTPUT")" > "$NAME-SHA256SUMS.txt"
+)
+
+if [[ "${KEEP_BACKUP_WORKDIR:-}" =~ ^(1|true)$ ]]; then
+  printf 'Keeping work directory because of KEEP_BACKUP_WORKDIR: %s\n' "$WORK_DIR"
+else
+  rm -rf "$WORK_DIR"
+fi
+
+cat <<EOF
+
+Backup complete.
+
+Bulk archive:
+  $BULK_ARCHIVE
+
+Secrets archive:
+  $SECRETS_OUTPUT
+
+Checksums:
+  $OUT_DIR/$NAME-SHA256SUMS.txt
+
+Do not email the secrets archive unless it is encrypted for the recipient.
+Set BACKUP_AGE_RECIPIENT or BACKUP_GPG_RECIPIENT before running this script if you want encryption handled automatically.
+EOF

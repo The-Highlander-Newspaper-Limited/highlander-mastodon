@@ -110,6 +110,167 @@ UptimeRobot setup details and plan capabilities can change. Refer to its
 [Discord integration guide](https://uptimerobot.com/integrations/discord-integration/).
 Check its [current pricing](https://uptimerobot.com/pricing/) when choosing or changing the monitoring setup.
 
+## Production backup
+
+Use `bin/production-backup` on the Elestio production VM to create a one-off
+backup of the Docker Compose deployment. The script reads the running Compose
+services and local files; it does not stop the application or modify the
+database.
+
+> **Caution:** The backup can consume significant disk space and I/O while
+> `pg_dump` and media compression run. Run it during a quieter traffic period
+> when possible, and confirm free disk space before starting.
+
+Run it from the production Compose project directory, the directory containing:
+
+```text
+docker-compose.yml
+.env.production
+public/system
+```
+
+Before running a backup, check the current directory, stack state, and free
+disk space:
+
+```shell
+pwd
+ls docker-compose.yml .env.production public/system
+docker compose ps
+df -h
+du -sh public/system postgres14
+```
+
+The current Compose deployment stores uploads on the VM filesystem at
+`./public/system`, mounted into the Rails and Sidekiq containers at
+`/mastodon/public/system`. PostgreSQL stores its data under `./postgres14`.
+The uploaded media files themselves are not stored as database blobs; the
+database stores records and attachment metadata.
+
+Do not treat a live copy of `./postgres14` as the database backup. That
+directory is PostgreSQL's running data directory, and copying it while the
+database is active can produce an inconsistent backup. The script backs up the
+database with `pg_dump -Fc` plus `pg_dumpall --globals-only` instead.
+
+### Run the backup
+
+Use a backup output directory outside the app tree when possible:
+
+```shell
+BACKUP_OUT=/root/mastodon-backups ./bin/production-backup
+```
+
+The script creates three final files in `BACKUP_OUT`:
+
+```text
+mastodon-production-<timestamp>-bulk.tar.gz
+mastodon-production-<timestamp>-secrets.tar.gz
+mastodon-production-<timestamp>-SHA256SUMS.txt
+```
+
+The bulk archive contains:
+
+- a custom-format PostgreSQL dump, created with `pg_dump -Fc`;
+- a PostgreSQL globals dump, created with `pg_dumpall --globals-only`;
+- a `public/system` media archive;
+- a manifest with redacted environment variable names and artifact sizes.
+
+The secrets archive contains `.env.production`, including values such as
+`SECRET_KEY_BASE`, Active Record encryption keys, VAPID keys, database settings,
+Redis settings, and SMTP settings.
+
+### Encrypt the secrets archive
+
+The plain `*-secrets.tar.gz` file is only compressed, not encrypted. Do not send
+it through email, chat, or normal file sharing unless it is encrypted first.
+
+If the recipient provides an `age` public key, run:
+
+```shell
+BACKUP_AGE_RECIPIENT='age1...' \
+  BACKUP_OUT=/root/mastodon-backups \
+  ./bin/production-backup
+```
+
+This produces `*-secrets.tar.gz.age`, decryptable only by the matching private
+age identity.
+
+If the recipient uses `GPG` and their public key is imported on the VM, run:
+
+```shell
+gpg --import recipient-public-key.asc
+gpg --list-keys recipient@example.com
+
+BACKUP_GPG_RECIPIENT='recipient@example.com' \
+  BACKUP_OUT=/root/mastodon-backups \
+  ./bin/production-backup
+```
+
+This produces `*-secrets.tar.gz.gpg`, decryptable only by the matching private
+GPG key.
+
+If neither `BACKUP_AGE_RECIPIENT` nor `BACKUP_GPG_RECIPIENT` is set, the final
+secrets archive is unencrypted. In that case, transfer it only through a secure
+vault or encrypted file-sharing system.
+
+### Copy backup files off the VM
+
+Use `scp` from the local machine, not from inside the VM. Replace `VM_HOST` with
+the Elestio VM hostname or IP address:
+
+```shell
+mkdir -p ~/highlander-backups
+scp root@VM_HOST:/root/mastodon-backups/mastodon-production-\* ~/highlander-backups/
+```
+
+If SSH uses a custom port, pass it with `-P`:
+
+```shell
+scp -P 2222 root@VM_HOST:/root/mastodon-backups/mastodon-production-\* ~/highlander-backups/
+```
+
+To copy only one backup run, list the backup directory on the VM and then copy
+the matching timestamped files:
+
+```shell
+ssh root@VM_HOST 'ls -lh /root/mastodon-backups'
+scp root@VM_HOST:/root/mastodon-backups/mastodon-production-<timestamp>-bulk.tar.gz ~/highlander-backups/
+scp root@VM_HOST:/root/mastodon-backups/mastodon-production-<timestamp>-secrets.tar.gz.age ~/highlander-backups/
+scp root@VM_HOST:/root/mastodon-backups/mastodon-production-<timestamp>-SHA256SUMS.txt ~/highlander-backups/
+```
+
+After the files are local, verify them from the destination directory:
+
+```shell
+cd ~/highlander-backups
+sha256sum -c mastodon-production-<timestamp>-SHA256SUMS.txt
+```
+
+If the secrets file ends in plain `.tar.gz`, it is not encrypted. Prefer copying
+an `.age` or `.gpg` secrets archive, or transfer the unencrypted secrets archive
+through a secure vault.
+
+### Operational notes
+
+The script creates a temporary per-run work directory under `BACKUP_OUT` and
+sets the backup directories to mode `700`. Temporary secret files and the final
+secrets archive are written with mode `600`. After checksums are written, the
+temporary work directory is deleted by default.
+
+To keep the temporary work directory for debugging, explicitly set:
+
+```shell
+KEEP_BACKUP_WORKDIR=1 ./bin/production-backup
+```
+
+or:
+
+```shell
+KEEP_BACKUP_WORKDIR=true ./bin/production-backup
+```
+
+Leaving the work directory behind also leaves intermediate database, media, and
+secrets files on disk, so avoid this on production unless needed.
+
 ## Elestio 502 recovery after Elestio update
 
 Highlander has seen 502 errors after Elestio VM update activity where the
