@@ -49,6 +49,4 @@ class StagingBasicAuth
   end
 end
 
-if ENV['STAGING_BASIC_AUTH_USER'].present? && ENV['STAGING_BASIC_AUTH_PASSWORD'].present?
-  Rails.application.config.middleware.use StagingBasicAuth
-end
+Rails.application.config.middleware.use StagingBasicAuth if ENV['STAGING_BASIC_AUTH_USER'].present? && ENV['STAGING_BASIC_AUTH_PASSWORD'].present?
