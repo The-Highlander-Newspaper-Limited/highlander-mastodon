@@ -58,12 +58,14 @@ to that reality instead of the original generic plan.
    containers (not part of our app) — left untouched.
 
 2. **Tore down the placeholder stack** (empty, no real data):
+
    ```shell
    cd /opt/app && docker compose down -v
    ```
 
 3. **Replaced the app directory** with our fork instead of the template,
    keeping the same path since Elestio's routing is tied to it:
+
    ```shell
    mv /opt/app /opt/app.elestio-template-backup
    git clone --branch staging https://github.com/The-Highlander-Newspaper-Limited/highlander-mastodon.git /opt/app
@@ -71,9 +73,11 @@ to that reality instead of the original generic plan.
 
 4. **Adapted our `docker-compose.yml` port bindings** to match Elestio's
    existing routing instead of the repo's defaults (`3000`/`4000`):
+
    ```shell
    sed -i "s/- '3000:3000'/- '172.17.0.1:7834:3000'/; s/- '4000:4000'/- '172.17.0.1:8834:4000'/" docker-compose.yml
    ```
+
    Note: port `8834` (streaming) is **not** exposed through Elestio's edge —
    only `443→7834` (the main app) is wired up currently. Live-updating
    timelines won't work on staging until a proper route for streaming is
@@ -81,6 +85,7 @@ to that reality instead of the original generic plan.
    else — loading, login, browsing restored data — is unaffected.
 
 5. **Built the image and generated secrets:**
+
    ```shell
    cp .env.production.sample .env.production
    docker compose build web
@@ -94,6 +99,7 @@ to that reality instead of the original generic plan.
    **production's actual `ACTIVE_RECORD_ENCRYPTION_*` keys** (not fresh
    ones), since the restored database's encrypted columns need the same keys
    used when they were encrypted:
+
    ```shell
    LOCAL_DOMAIN=staging.thehighlander.app
    ALTERNATE_DOMAINS=staging-highlander-u54198.vm.elestio.app
@@ -126,9 +132,11 @@ to that reality instead of the original generic plan.
    VAPID_PRIVATE_KEY=wuiplIZnNGImcx2QjCzR2xIudD9n_85y3qS8CVvK_V4=
    VAPID_PUBLIC_KEY=BCEx26XOnXkB1wZEFL62A9vvW4MvlS9Yv9YnxDB6imUvI6-d-h1bo6Q80SW7LtaFE2mwpkwlgdFAgPi86qYxvpE=
    ```
+
    **`SMTP_*` deliberately left unset** — see Safety section below.
 
 7. **Brought up the stack:**
+
    ```shell
    docker compose up -d db redis
    docker compose run --rm -e SAFETY_ASSURED=1 web bundle exec rails db:setup
@@ -138,6 +146,7 @@ to that reality instead of the original generic plan.
 8. **Transferred and restored the backup** — same procedure as the local
    restore in `RUNBOOK.md`, run against `/opt/app` on the VM instead of the
    local repo:
+
    ```shell
    # from the Mac:
    scp "/Volumes/Ronak Data/projects/upwork/Simon/Backup/mastodon-production-20260715T143531Z-bulk.tar.gz" root@staging-highlander-u54198.vm.elestio.app:/root/

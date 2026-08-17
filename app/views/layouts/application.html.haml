@@ -59,7 +59,7 @@
 
   %body{ class: body_classes }
     - if ENV['STAGING_BANNER'] == 'true'
-      #staging-banner{ 'aria-hidden' => 'true', title: 'Staging environment' }
+      #staging-banner{ 'aria-hidden' => 'true', 'title' => 'Staging environment' }
 
     = content_for?(:content) ? yield(:content) : yield
 
