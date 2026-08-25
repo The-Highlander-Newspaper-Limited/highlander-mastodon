@@ -2,10 +2,7 @@ import { createReducer } from '@reduxjs/toolkit';
 import type { RecordOf } from 'immutable';
 import { Map as ImmutableMap, Record as ImmutableRecord } from 'immutable';
 
-import type {
-  AccountCategory,
-  AccountCategoryShape,
-} from '@/mastodon/models/account_categories';
+import type { AccountCategory } from '@/mastodon/models/account_categories';
 import { AccountCategoryFactory } from '@/mastodon/models/account_categories';
 import {
   addCategoryFilter,
@@ -42,7 +39,7 @@ const normalizeCategory = (
     id: categoryJSON.id,
     name: categoryJSON.name,
     mandatory_for_readers: categoryJSON.mandatory_for_readers,
-  } as AccountCategoryShape);
+  });
 };
 
 const getCategoryId = (category: AccountCategory) =>
