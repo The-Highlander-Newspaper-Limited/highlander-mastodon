@@ -5,10 +5,10 @@
 # Table name: software_updates
 #
 #  id            :bigint(8)        not null, primary key
-#  release_notes :string           default(""), not null
-#  type          :integer          default("patch"), not null
-#  urgent        :boolean          default(FALSE), not null
 #  version       :string           not null
+#  urgent        :boolean          default(FALSE), not null
+#  type          :integer          default("patch"), not null
+#  release_notes :string           default(""), not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #
@@ -45,10 +45,6 @@ class SoftwareUpdate < ApplicationRecord
       return [] unless check_enabled?
 
       all.to_a.filter(&:pending?)
-    end
-
-    def pending?
-      pending_to_a.present?
     end
 
     def urgent_pending?

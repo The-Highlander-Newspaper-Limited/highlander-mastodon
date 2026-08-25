@@ -7,13 +7,10 @@ class AuthorizeInteractionsController < ApplicationController
   before_action :set_resource
 
   def show
-    case @resource
-    when Account
+    if @resource.is_a?(Account)
       redirect_to web_url("@#{@resource.pretty_acct}")
-    when Status
+    elsif @resource.is_a?(Status)
       redirect_to web_url("@#{@resource.account.pretty_acct}/#{@resource.id}")
-    when Collection
-      redirect_to web_url("collections/#{@resource.id}")
     else
       not_found
     end
@@ -24,7 +21,7 @@ class AuthorizeInteractionsController < ApplicationController
   def set_resource
     @resource = located_resource
     authorize(@resource, :show?) if @resource.is_a?(Status)
-  rescue ActiveRecord::RecordNotFound, Mastodon::NotPermittedError
+  rescue Mastodon::NotPermittedError
     not_found
   end
 

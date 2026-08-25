@@ -14,7 +14,6 @@ import {
 
 import type { ApiQuotePolicy } from '../api_types/quotes';
 import type { Status, StatusVisibility } from '../models/status';
-import type { RootState } from '../store';
 
 import { showAlert } from './alerts';
 import { changeCompose, focusCompose } from './compose';
@@ -49,7 +48,7 @@ const messages = defineMessages({
 });
 
 type SimulatedMediaAttachmentJSON = ApiMediaAttachmentJSON & {
-  attached?: boolean;
+  unattached?: boolean;
 };
 
 const simulateModifiedApiResponse = (
@@ -67,8 +66,7 @@ const simulateModifiedApiResponse = (
         y: parseFloat(y ?? '0'),
       },
     },
-    attached: true,
-  } as SimulatedMediaAttachmentJSON;
+  } as unknown as SimulatedMediaAttachmentJSON;
 
   return data;
 };
@@ -138,7 +136,7 @@ export const changeUploadCompose = createDataLoadingThunk(
   (media: SimulatedMediaAttachmentJSON) => {
     return {
       media,
-      attached: typeof media.attached !== 'undefined' && media.attached,
+      attached: typeof media.unattached !== 'undefined' && !media.unattached,
     };
   },
   {
@@ -214,17 +212,6 @@ export const quoteComposeById = createAppThunk(
   },
 );
 
-const composeStateForbidsLink = (composeState: RootState['compose']) => {
-  return (
-    composeState.get('quoted_status_id') ||
-    composeState.get('is_submitting') ||
-    composeState.get('poll') ||
-    composeState.get('is_uploading') ||
-    composeState.get('id') ||
-    composeState.get('privacy') === 'direct'
-  );
-};
-
 export const pasteLinkCompose = createDataLoadingThunk(
   'compose/pasteLink',
   async ({ url }: { url: string }) => {
@@ -235,12 +222,16 @@ export const pasteLinkCompose = createDataLoadingThunk(
       limit: 2,
     });
   },
-  (data, { dispatch, getState, requestId }) => {
+  (data, { dispatch, getState }) => {
     const composeState = getState().compose;
 
     if (
-      composeStateForbidsLink(composeState) ||
-      composeState.get('fetching_link') !== requestId // Request has been cancelled
+      composeState.get('quoted_status_id') ||
+      composeState.get('is_submitting') ||
+      composeState.get('poll') ||
+      composeState.get('is_uploading') ||
+      composeState.get('id') ||
+      composeState.get('privacy') === 'direct'
     )
       return;
 
@@ -256,25 +247,10 @@ export const pasteLinkCompose = createDataLoadingThunk(
       dispatch(quoteComposeById(data.statuses[0].id));
     }
   },
-  {
-    useLoadingBar: false,
-    condition: (_, { getState }) =>
-      !getState().compose.get('fetching_link') &&
-      !composeStateForbidsLink(getState().compose),
-  },
-);
-
-// Ideally this would cancel the action and the HTTP request, but this is good enough
-export const cancelPasteLinkCompose = createAction(
-  'compose/cancelPasteLinkCompose',
 );
 
 export const quoteComposeCancel = createAction('compose/quoteComposeCancel');
 
 export const setComposeQuotePolicy = createAction<ApiQuotePolicy>(
   'compose/setQuotePolicy',
-);
-
-export const setDragUploadEnabled = createAction<boolean>(
-  'compose/setDragUploadEnabled',
 );

@@ -3,7 +3,7 @@ import { PureComponent } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
-import { Helmet } from '@unhead/react/helmet';
+import { Helmet } from 'react-helmet';
 
 import StackTrace from 'stacktrace-js';
 

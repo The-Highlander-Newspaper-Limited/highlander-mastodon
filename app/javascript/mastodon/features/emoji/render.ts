@@ -4,9 +4,14 @@ import {
   EMOJI_TYPE_UNICODE,
   EMOJI_TYPE_CUSTOM,
 } from './constants';
-import { emojiToInversionClassName, unicodeHexToUrl } from './normalize';
+import {
+  loadCustomEmojiByShortcode,
+  loadEmojiByHexcode,
+  LocaleNotLoadedError,
+} from './database';
+import { importEmojiData } from './loader';
+import { emojiToUnicodeHex } from './normalize';
 import type {
-  EmojiAppState,
   EmojiLoadedState,
   EmojiMode,
   EmojiState,
@@ -17,7 +22,6 @@ import type {
 import {
   anyEmojiRegex,
   emojiLogger,
-  emojiToUnicodeHex,
   isCustomEmoji,
   isUnicodeEmoji,
   stringHasUnicodeFlags,
@@ -49,14 +53,14 @@ export function tokenizeText(text: string): TokenizedText {
     if (code.startsWith(':') && code.endsWith(':')) {
       // Custom emoji
       tokens.push({
-        code,
         type: EMOJI_TYPE_CUSTOM,
+        code,
       } satisfies EmojiStateCustom);
     } else {
       // Unicode emoji
       tokens.push({
-        code,
         type: EMOJI_TYPE_UNICODE,
+        code: code,
       } satisfies EmojiStateUnicode);
     }
     lastIndex = match.index + code.length;
@@ -75,88 +79,24 @@ export function tokenizeText(text: string): TokenizedText {
 export function stringToEmojiState(
   code: string,
   customEmoji: ExtraCustomEmojiMap = {},
-): EmojiStateUnicode | Required<EmojiStateCustom> | null {
+): EmojiState | null {
   if (isUnicodeEmoji(code)) {
     return {
-      code: emojiToUnicodeHex(code),
       type: EMOJI_TYPE_UNICODE,
+      code: emojiToUnicodeHex(code),
     };
   }
 
   if (isCustomEmoji(code)) {
     const shortCode = code.slice(1, -1);
-    if (customEmoji[shortCode]) {
-      return {
-        type: EMOJI_TYPE_CUSTOM,
-        code: shortCode,
-        data: customEmoji[shortCode],
-      };
-    }
+    return {
+      type: EMOJI_TYPE_CUSTOM,
+      code: shortCode,
+      data: customEmoji[shortCode],
+    };
   }
 
   return null;
-}
-
-/**
- * Takes an element and emojifies all native emoji.
- */
-export async function updateHtmlWithEmoji({
-  assetHost,
-  darkTheme,
-  element,
-  mode,
-  locale,
-}: {
-  element: Element;
-  locale: string;
-} & Omit<EmojiAppState, 'currentLocale'>) {
-  if (mode === EMOJI_MODE_NATIVE) {
-    return;
-  }
-
-  const tokens = tokenizeText(element.innerHTML);
-  const newChildren: (string | Element)[] = [];
-  for (const token of tokens) {
-    if (typeof token === 'string') {
-      newChildren.push(token);
-      continue;
-    }
-
-    const state = await loadEmojiDataToState(token, locale);
-    // Ignore custom emoji if we encounter them.
-    if (!state || state.type === EMOJI_TYPE_CUSTOM) {
-      newChildren.push(token.code);
-      continue;
-    }
-
-    if (!shouldRenderImage(state, mode)) {
-      newChildren.push(state.data.unicode);
-      continue;
-    }
-
-    const img = document.createElement('img');
-    img.src = unicodeHexToUrl({
-      assetHost,
-      darkTheme,
-      unicodeHex: state.data.hexcode,
-    });
-    img.alt = state.data.unicode;
-    img.title = state.data.label;
-    img.classList.add('emojione');
-
-    const inversionClass = emojiToInversionClassName(state.data.unicode);
-    if (inversionClass) {
-      img.classList.add(inversionClass);
-    }
-
-    newChildren.push(img);
-  }
-
-  element.innerHTML = newChildren.reduce<string>(
-    (prev, curr) =>
-      typeof curr === 'string' ? prev + curr : prev + curr.outerHTML,
-    '',
-  );
 }
 
 /**
@@ -174,49 +114,42 @@ export async function loadEmojiDataToState(
     return state;
   }
 
-  // Don't try to load data for custom emoji.
-  if (state.type === EMOJI_TYPE_CUSTOM) {
-    return null;
-  }
-
-  const {
-    loadLegacyShortcodesByShortcode,
-    loadEmojiByHexcode,
-    LocaleNotLoadedError,
-  } = await import('./database');
-
-  const code = isUnicodeEmoji(state.code)
-    ? emojiToUnicodeHex(state.code)
-    : state.code;
-
   // First, try to load the data from IndexedDB.
   try {
-    const legacyCode = await loadLegacyShortcodesByShortcode(code);
     // This is duplicative, but that's because TS can't distinguish the state type easily.
-    const data = await loadEmojiByHexcode(legacyCode?.hexcode ?? code, locale);
-    if (data) {
-      return {
-        ...state,
-        code,
-        type: EMOJI_TYPE_UNICODE,
-        data,
-        // TODO: Use CLDR shortcodes when the picker supports them.
-        shortcode: legacyCode?.shortcodes.at(0),
-      };
+    if (state.type === EMOJI_TYPE_UNICODE) {
+      const data = await loadEmojiByHexcode(state.code, locale);
+      if (data) {
+        return {
+          ...state,
+          data,
+        };
+      }
+    } else {
+      const data = await loadCustomEmojiByShortcode(state.code);
+      if (data) {
+        return {
+          ...state,
+          data,
+        };
+      }
     }
-
     // If not found, assume it's not an emoji and return null.
-    log('Could not find emoji %s for locale %s', code, locale);
+    log(
+      'Could not find emoji %s of type %s for locale %s',
+      state.code,
+      state.type,
+      locale,
+    );
     return null;
   } catch (err: unknown) {
     // If the locale is not loaded, load it and retry once.
     if (!retry && err instanceof LocaleNotLoadedError) {
       log(
         'Error loading emoji %s for locale %s, loading locale and retrying.',
-        code,
+        state.code,
         locale,
       );
-      const { importEmojiData } = await import('./loader');
       await importEmojiData(locale); // Use this from the loader file as it can be awaited.
       return loadEmojiDataToState(state, locale, true);
     }

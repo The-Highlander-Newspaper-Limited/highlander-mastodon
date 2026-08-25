@@ -241,11 +241,7 @@ export const PwaInstallPrompt: React.FC = () => {
   return (
     <InstallBanner
       action={
-        <button
-          type='button'
-          className='button button-tertiary'
-          onClick={handleInstallClick}
-        >
+        <button className='button button-tertiary' onClick={handleInstallClick}>
           <FormattedMessage
             id='pwa_install_prompt.install.action'
             defaultMessage='Install the app'

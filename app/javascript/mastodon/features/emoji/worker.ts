@@ -1,40 +1,18 @@
-import debug from 'debug';
-
-import { EMOJI_DB_NAME_SHORTCODES, EMOJI_TYPE_CUSTOM } from './constants';
-import {
-  importCustomEmojiData,
-  importEmojiData,
-  importLegacyShortcodes,
-} from './loader';
-import type { EmojiWorkerMessage } from './types';
+import { importEmojiData, importCustomEmojiData } from './loader';
 
 addEventListener('message', handleMessage);
-self.postMessage({ type: 'ready' } satisfies EmojiWorkerMessage); // After the worker is ready, notify the main thread
+self.postMessage('ready'); // After the worker is ready, notify the main thread
 
-function handleMessage(event: MessageEvent<EmojiWorkerMessage>) {
-  const { data } = event;
-  if (data.type === 'debug') {
-    debug.enable(data.debugValue);
-  } else if (data.type === 'load') {
-    void loadData(data.storeName);
-  }
+function handleMessage(event: MessageEvent<string>) {
+  const { data: locale } = event;
+  void loadData(locale);
 }
 
-async function loadData(storeName: string) {
-  let importCount: number | undefined;
-  if (storeName === EMOJI_TYPE_CUSTOM) {
-    importCount = (await importCustomEmojiData())?.length;
-  } else if (storeName === EMOJI_DB_NAME_SHORTCODES) {
-    importCount = (await importLegacyShortcodes())?.length;
+async function loadData(locale: string) {
+  if (locale !== 'custom') {
+    await importEmojiData(locale);
   } else {
-    importCount = (await importEmojiData(storeName))?.length;
+    await importCustomEmojiData();
   }
-
-  if (importCount) {
-    self.postMessage({
-      type: 'done',
-      storeName,
-      importCount,
-    } satisfies EmojiWorkerMessage);
-  }
+  self.postMessage(`loaded ${locale}`);
 }

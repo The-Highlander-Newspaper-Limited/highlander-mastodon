@@ -25,18 +25,7 @@
     = form.input :highlighted,
                  wrapper: :with_label
 
-- if current_user.role.administrator? || current_user.role != form.object
-  .fields-group
-    = form.input :require_2fa,
-                 wrapper: :with_label
-
-%hr.spacer/
-
-.fields-group
-  = form.input :collection_limit,
-               wrapper: :with_label
-
-%hr.spacer/
+  %hr.spacer/
 
 - unless current_user.role == form.object
 
@@ -47,7 +36,7 @@
 
     -# Our fork has additional permissions for the everyone role
     - (form.object.everyone? ? UserRole::Flags::CATEGORIES.slice(:invites, :interaction) : UserRole::Flags::CATEGORIES).each do |category, permissions|
-      %h2= t(category, scope: 'admin.roles.categories')
+      %h4= t(category, scope: 'admin.roles.categories')
 
       = form.input :permissions_as_keys,
                    as: :check_boxes,

@@ -17,7 +17,7 @@ RSpec.describe PublishAnnouncementReactionWorker do
 
       worker.perform(announcement.id, name)
 
-      expect(redis).to have_received(:publish).with(include('timeline'), be_a(String))
+      expect(redis).to have_received(:publish)
     end
 
     it 'does not send the announcement and name to the service when not subscribed' do

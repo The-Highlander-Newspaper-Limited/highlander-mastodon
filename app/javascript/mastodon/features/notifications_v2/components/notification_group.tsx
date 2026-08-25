@@ -8,7 +8,6 @@ import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
 import { NotificationAdminReport } from './notification_admin_report';
 import { NotificationAdminSignUp } from './notification_admin_sign_up';
-import { NotificationCollection } from './notification_collection';
 import { NotificationFavourite } from './notification_favourite';
 import { NotificationFollow } from './notification_follow';
 import { NotificationFollowRequest } from './notification_follow_request';
@@ -151,15 +150,6 @@ export const NotificationGroup: React.FC<{
     case 'annual_report':
       // highlander: annual report feature disabled; never render this notification.
       return null;
-    case 'added_to_collection':
-    case 'collection_update':
-      content = (
-        <NotificationCollection
-          unread={unread}
-          notification={notificationGroup}
-        />
-      );
-      break;
     default:
       return null;
   }

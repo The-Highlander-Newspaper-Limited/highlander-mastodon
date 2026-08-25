@@ -1,10 +1,9 @@
 import { useCallback, useMemo } from 'react';
 
-import type { List, Map } from 'immutable';
+import type { List } from 'immutable';
 
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { useElementHandledLink } from '@/mastodon/components/status/handled_link';
-import type { CustomEmoji } from '@/mastodon/models/custom_emoji';
 import type { Status } from '@/mastodon/models/status';
 
 import type { Mention } from './embedded_status';
@@ -23,19 +22,8 @@ export const EmbeddedStatusContent: React.FC<{
     },
     [mentions],
   );
-  const hrefToCollection = useCallback(
-    (href: string) => {
-      const collections = status.get('tagged_collections') as List<
-        Map<'url' | 'id', string>
-      >;
-      const collection = collections.find((item) => item.get('url') === href);
-      return collection?.get('id');
-    },
-    [status],
-  );
   const htmlHandlers = useElementHandledLink({
     hashtagAccountId: status.get('account') as string | undefined,
-    hrefToCollectionId: hrefToCollection,
     hrefToMention,
   });
 
@@ -45,7 +33,6 @@ export const EmbeddedStatusContent: React.FC<{
       className={className}
       lang={status.get('language') as string}
       htmlString={status.get('contentHtml') as string}
-      extraEmojis={status.get('emojis') as List<CustomEmoji>}
     />
   );
 };

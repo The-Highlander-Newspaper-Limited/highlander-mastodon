@@ -1,5 +1,6 @@
 @use 'sass:color';
 @use 'sass:math';
+@use 'functions' as *;
 @use 'variables' as *;
 @use 'categories';
 
@@ -34,6 +35,7 @@ $content-width: 840px;
     &__inner {
       display: flex;
       justify-content: flex-end;
+      background: var(--background-color);
       height: 100%;
     }
   }
@@ -45,8 +47,8 @@ $content-width: 840px;
 
     &__toggle {
       display: none;
-      background: var(--color-bg-primary);
-      border-bottom: 1px solid var(--color-border-primary);
+      background: var(--background-color);
+      border-bottom: 1px solid lighten($ui-base-color, 4%);
       align-items: center;
 
       &__logo {
@@ -60,7 +62,7 @@ $content-width: 840px;
 
       &__icon {
         display: block;
-        color: var(--color-text-secondary);
+        color: $darker-text-color;
         text-decoration: none;
         flex: 0 0 auto;
         font-size: 18px;
@@ -69,7 +71,7 @@ $content-width: 840px;
         border-radius: 4px;
 
         &:focus {
-          background: var(--color-bg-brand-softest);
+          background: $ui-base-color;
         }
 
         .material-close {
@@ -123,28 +125,20 @@ $content-width: 840px;
         align-items: center;
         gap: 6px;
         padding: 15px;
-        color: color-mix(
-          in oklab,
-          var(--color-text-primary),
-          var(--color-text-secondary)
-        );
+        color: $darker-text-color;
         text-decoration: none;
         transition: all 200ms linear;
         transition-property: color, background-color;
 
         &:hover {
-          color: var(--color-text-primary);
+          color: $primary-text-color;
           transition: all 100ms linear;
           transition-property: color, background-color;
-        }
-
-        &:focus-visible {
-          outline: var(--outline-focus-default);
-          outline-offset: -2px;
         }
       }
 
       ul {
+        background: var(--background-color);
         margin: 0;
 
         a {
@@ -154,12 +148,12 @@ $content-width: 840px;
       }
 
       .warning a {
-        color: var(--color-text-warning);
+        color: $gold-star;
         font-weight: 700;
       }
 
       .simple-navigation-active-leaf a {
-        color: var(--color-text-brand);
+        color: $highlight-text-color;
         border-bottom: 0;
       }
     }
@@ -170,7 +164,6 @@ $content-width: 840px;
     width: 100%;
     max-width: $content-width;
     flex: 1 1 auto;
-    isolation: isolate;
   }
 
   @media screen and (max-width: ($content-width + $sidebar-width)) {
@@ -235,7 +228,7 @@ $content-width: 840px;
           align-items: center;
           padding: 7px 10px;
           border-radius: 4px;
-          color: var(--color-text-secondary);
+          color: $darker-text-color;
           text-decoration: none;
           font-weight: 500;
           gap: 5px;
@@ -248,13 +241,13 @@ $content-width: 840px;
           &:hover,
           &:focus,
           &:active {
-            background: var(--color-bg-secondary);
+            background: lighten($ui-base-color, 4%);
           }
 
           &.selected {
             font-weight: 700;
-            color: var(--color-text-on-brand-base);
-            background: var(--color-bg-brand-base);
+            color: $primary-text-color;
+            background: $ui-highlight-color;
           }
         }
       }
@@ -274,11 +267,11 @@ $content-width: 840px;
         }
       }
 
-      h1 small {
+      h2 small {
         font-size: 12px;
         display: block;
         font-weight: 500;
-        color: var(--color-text-secondary);
+        color: $darker-text-color;
         line-height: 18px;
       }
 
@@ -288,53 +281,56 @@ $content-width: 840px;
       }
     }
 
-    :where(h1),
-    .heading-large {
-      color: var(--color-text-primary);
+    h2 {
+      color: $secondary-text-color;
       font-size: 24px;
       line-height: 36px;
       font-weight: 700;
     }
 
-    :where(h2):not(.heading-medium),
-    .heading-small {
-      text-transform: uppercase;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--color-text-secondary);
-      padding-top: 24px;
-      margin-bottom: 8px;
-      border-top: 1px solid var(--color-border-primary);
-    }
-
-    .heading-medium {
-      color: var(--color-text-primary);
+    h3 {
+      color: $secondary-text-color;
       font-size: 20px;
       line-height: 28px;
       font-weight: 400;
       margin-bottom: 30px;
     }
 
+    h4 {
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 700;
+      color: $darker-text-color;
+      padding-top: 24px;
+      margin-bottom: 8px;
+      border-top: 1px solid var(--background-border-color);
+    }
+
     h6 {
       font-size: 16px;
-      color: var(--color-text-primary);
+      color: $secondary-text-color;
       line-height: 28px;
       font-weight: 500;
     }
 
     .fields-group h6 {
-      color: var(--color-text-primary);
+      color: $primary-text-color;
       font-weight: 500;
+    }
+
+    .directory__tag > a,
+    .directory__tag > div {
+      box-shadow: none;
     }
 
     .directory__tag h4 {
       font-size: 18px;
       font-weight: 700;
-      color: var(--color-text-primary);
+      color: $primary-text-color;
       text-transform: none;
-      padding-top: 0;
+      padding-bottom: 0;
       margin-bottom: 0;
-      border-top: 0;
+      border-bottom: 0;
 
       .comment {
         display: block;
@@ -344,12 +340,12 @@ $content-width: 840px;
 
         &.private-comment {
           display: block;
-          color: var(--color-text-secondary);
+          color: $darker-text-color;
         }
 
         &.public-comment {
           display: block;
-          color: var(--color-text-primary);
+          color: $secondary-text-color;
         }
       }
     }
@@ -357,11 +353,11 @@ $content-width: 840px;
     & > p {
       font-size: 14px;
       line-height: 21px;
-      color: var(--color-text-primary);
+      color: $secondary-text-color;
       margin-bottom: 20px;
 
       strong {
-        color: var(--color-text-primary);
+        color: $primary-text-color;
         font-weight: 500;
 
         @each $lang in $cjk-langs {
@@ -376,7 +372,7 @@ $content-width: 840px;
       width: 100%;
       height: 0;
       border: 0;
-      border-bottom: 1px solid var(--color-border-primary);
+      border-bottom: 1px solid var(--background-border-color);
       margin: 20px 0;
 
       &.spacer {
@@ -384,16 +380,6 @@ $content-width: 840px;
         border: 0;
       }
     }
-  }
-
-  details > summary {
-    text-transform: uppercase;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--color-text-secondary);
-    padding-top: 24px;
-    margin-bottom: 8px;
-    cursor: pointer;
   }
 
   @media screen and (max-width: $no-columns-breakpoint) {
@@ -412,7 +398,7 @@ $content-width: 840px;
         display: flex;
       }
 
-      & > nav > ul {
+      & > ul {
         display: none;
 
         &.visible {
@@ -424,7 +410,7 @@ $content-width: 840px;
           inset-inline-start: 0;
           bottom: 0;
           overflow-y: auto;
-          background: var(--color-bg-primary);
+          background: var(--background-color);
         }
       }
 
@@ -444,74 +430,8 @@ $content-width: 840px;
       }
 
       ul .simple-navigation-active-leaf a {
-        border-bottom-color: var(--color-border-brand);
+        border-bottom-color: $ui-highlight-color;
       }
-    }
-  }
-
-  .callout {
-    display: flex;
-    align-items: start;
-    padding: 12px;
-    gap: 8px;
-    background-color: var(--color-bg-brand-softest);
-    color: var(--color-text-primary);
-    border-radius: 12px;
-    font-size: 15px;
-    line-height: 1.3333;
-    margin-bottom: 30px;
-
-    .icon {
-      padding: 4px;
-      border-radius: 9999px;
-      width: 1rem;
-      height: 1rem;
-      margin-block: -2px;
-      background-color: var(--color-bg-brand-soft);
-    }
-
-    &.variantWarning {
-      background-color: var(--color-bg-warning-softest);
-
-      .icon {
-        background-color: var(--color-bg-warning-soft);
-      }
-    }
-
-    &.variantError {
-      background-color: var(--color-bg-error-softest);
-
-      .icon {
-        background-color: var(--color-bg-error-soft);
-      }
-    }
-
-    .content {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex-grow: 1;
-      padding: 0;
-
-      @media screen and (width >= 630px) {
-        flex-direction: row;
-      }
-    }
-
-    .body {
-      flex-grow: 1;
-    }
-
-    .title {
-      font-weight: 600;
-      margin-bottom: 6px;
-      font-size: inherit;
-      line-height: inherit;
-    }
-
-    a {
-      color: inherit;
-      font-weight: 600;
     }
   }
 }
@@ -526,10 +446,10 @@ hr.spacer {
 body,
 .admin-wrapper .content {
   .muted-hint {
-    color: var(--color-text-secondary);
+    color: $darker-text-color;
 
     a {
-      color: var(--color-text-brand);
+      color: $highlight-text-color;
     }
   }
 
@@ -549,29 +469,29 @@ body,
   }
 
   .positive-hint {
-    color: var(--color-text-success);
+    color: $valid-value-color;
     font-weight: 500;
   }
 
   .negative-hint {
-    color: var(--color-text-error);
+    color: $error-value-color;
     font-weight: 500;
   }
 
   .neutral-hint {
-    color: var(--color-text-primary);
+    color: $dark-text-color;
     font-weight: 500;
   }
 
   .warning-hint {
-    color: var(--color-text-warning);
+    color: $gold-star;
     font-weight: 500;
   }
 }
 
 kbd {
   font-family: Courier, monospace;
-  background-color: var(--color-bg-brand-softest);
+  background-color: color.change($ui-secondary-color, $alpha: 0.1);
   padding: 4px;
   padding-bottom: 2px;
   border-radius: 5px;
@@ -624,21 +544,21 @@ kbd {
 
     a {
       display: inline-block;
-      color: var(--color-text-secondary);
+      color: $darker-text-color;
       text-decoration: none;
       text-transform: uppercase;
       font-size: 12px;
       font-weight: 500;
-      border-bottom: 2px solid var(--color-bg-secondary);
+      border-bottom: 2px solid $ui-base-color;
 
       &:hover {
-        color: var(--color-text-primary);
-        border-bottom: 2px solid var(--color-bg-tertiary);
+        color: $primary-text-color;
+        border-bottom: 2px solid lighten($ui-base-color, 5%);
       }
 
       &.selected {
-        color: var(--color-text-brand);
-        border-bottom: 2px solid var(--color-border-brand);
+        color: $highlight-text-color;
+        border-bottom: 2px solid $ui-highlight-color;
       }
     }
   }
@@ -662,7 +582,7 @@ kbd {
     font-weight: 500;
     font-size: 14px;
     line-height: 18px;
-    color: var(--color-text-primary);
+    color: $secondary-text-color;
 
     @each $lang in $cjk-langs {
       &:lang(#{$lang}) {
@@ -721,7 +641,7 @@ kbd {
   font-size: 14px;
 
   a {
-    color: var(--color-text-brand);
+    color: $highlight-text-color;
     text-decoration: none;
 
     &:hover {
@@ -751,25 +671,25 @@ kbd {
   line-height: 20px;
   padding: 15px;
   padding-inline-start: 15px * 2 + 40px;
-  background: var(--color-bg-primary);
-  border-right: 1px solid var(--color-border-primary);
-  border-left: 1px solid var(--color-border-primary);
-  border-bottom: 1px solid var(--color-border-primary);
+  background: var(--background-color);
+  border-right: 1px solid var(--background-border-color);
+  border-left: 1px solid var(--background-border-color);
+  border-bottom: 1px solid var(--background-border-color);
   position: relative;
   text-decoration: none;
-  color: var(--color-text-secondary);
+  color: $darker-text-color;
   font-size: 14px;
 
   &:first-child {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    border-top: 1px solid var(--color-border-primary);
+    border-top: 1px solid var(--background-border-color);
   }
 
   &:last-child {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
-    border-bottom: 1px solid var(--color-border-primary);
+    border-bottom: 1px solid var(--background-border-color);
   }
 
   &__avatar {
@@ -789,13 +709,13 @@ kbd {
   }
 
   &__timestamp {
-    color: var(--color-text-tertiary);
+    color: $dark-text-color;
   }
 
   a,
   .username,
   .target {
-    color: var(--color-text-primary);
+    color: $secondary-text-color;
     text-decoration: none;
     font-weight: 500;
   }
@@ -814,12 +734,12 @@ kbd {
   line-height: 20px;
   padding: 15px;
   padding-inline-start: 15px * 2 + 40px;
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border-primary);
+  background: var(--background-color);
+  border: 1px solid var(--background-border-color);
   border-radius: 4px;
   position: relative;
   text-decoration: none;
-  color: var(--color-text-secondary);
+  color: $darker-text-color;
   font-size: 14px;
   margin-bottom: 15px;
 
@@ -840,13 +760,13 @@ kbd {
   }
 
   &__timestamp {
-    color: var(--color-text-secondary);
+    color: $dark-text-color;
   }
 
   &:hover,
   &:focus,
   &:active {
-    background: var(--color-bg-primary);
+    background: $ui-base-color;
   }
 }
 
@@ -855,10 +775,10 @@ a.name-tag,
 a.inline-name-tag,
 .inline-name-tag {
   text-decoration: none;
-  color: var(--color-text-primary);
+  color: $secondary-text-color;
 
   &:hover {
-    color: var(--color-text-brand);
+    color: $highlight-text-color;
   }
 
   .username {
@@ -868,7 +788,7 @@ a.inline-name-tag,
   &.suspended {
     .username {
       text-decoration: line-through;
-      color: var(--color-text-error);
+      color: lighten($error-red, 12%);
     }
 
     .avatar {
@@ -901,18 +821,18 @@ a.name-tag,
 
 .speech-bubble {
   margin-bottom: 20px;
-  border-inline-start: 4px solid var(--color-border-brand);
+  border-inline-start: 4px solid $ui-highlight-color;
 
   &.positive {
-    border-color: var(--color-text-success);
+    border-left-color: $success-green;
   }
 
   &.negative {
-    border-color: var(--color-border-error);
+    border-left-color: lighten($error-red, 12%);
   }
 
   &.warning {
-    border-color: var(--color-text-warning);
+    border-left-color: $gold-star;
   }
 
   &__bubble {
@@ -925,7 +845,7 @@ a.name-tag,
     font-weight: 500;
 
     a {
-      color: var(--color-text-secondary);
+      color: $darker-text-color;
     }
   }
 
@@ -935,13 +855,13 @@ a.name-tag,
   }
 
   time {
-    color: var(--color-text-tertiary);
+    color: $dark-text-color;
   }
 }
 
 .report-card {
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border-primary);
+  background: var(--background-color);
+  border: 1px solid var(--background-border-color);
   border-radius: 4px;
   margin-bottom: 20px;
 
@@ -963,7 +883,7 @@ a.name-tag,
     &__stats {
       flex: 0 0 auto;
       font-weight: 500;
-      color: var(--color-text-secondary);
+      color: $darker-text-color;
       text-transform: uppercase;
       text-align: end;
 
@@ -974,12 +894,12 @@ a.name-tag,
         &:focus,
         &:hover,
         &:active {
-          color: var(--color-text-brand);
+          color: $highlight-text-color;
         }
       }
 
       .red {
-        color: var(--color-text-error);
+        color: $error-value-color;
       }
     }
   }
@@ -988,7 +908,7 @@ a.name-tag,
     &__item {
       display: flex;
       justify-content: flex-start;
-      border-top: 1px solid var(--color-border-primary);
+      border-top: 1px solid var(--background-border-color);
 
       &__reported-by,
       &__assigned {
@@ -996,7 +916,7 @@ a.name-tag,
         flex: 0 0 auto;
         box-sizing: border-box;
         width: 150px;
-        color: var(--color-text-secondary);
+        color: $darker-text-color;
 
         &,
         .username {
@@ -1022,10 +942,10 @@ a.name-tag,
         width: 100%;
         padding: 15px;
         text-decoration: none;
-        color: var(--color-text-secondary);
+        color: $darker-text-color;
 
         &:hover {
-          color: var(--color-text-brand);
+          color: $highlight-text-color;
         }
       }
     }
@@ -1060,121 +980,35 @@ a.name-tag,
     max-width: 100%;
   }
 
-  &__fields,
-  &__content {
-    background: var(--color-bg-primary);
-    border: 1px solid var(--color-border-primary);
+  .account__header__fields,
+  .account__header__content {
+    background: var(--background-color);
+    border: 1px solid var(--background-border-color);
     border-radius: 4px;
     height: 100%;
   }
 
-  &__fields {
-    border: 1px solid var(--color-border-primary);
-    font-size: 14px;
-    line-height: 20px;
-    display: grid;
-    grid-template-columns: 120px auto;
-    grid-auto-flow: row;
-
-    dl {
-      display: flex;
-    }
-
-    dt,
-    dd {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      padding: 14px;
-      text-align: center;
-      border-bottom: 1px solid var(--color-border-primary);
-
-      &:last-of-type:not(.verified) {
-        border-bottom: none;
-      }
-    }
-
-    dt {
-      font-weight: 500;
-      width: 120px;
-      flex: 0 0 auto;
-      color: var(--color-text-primary);
-      background: var(--color-bg-secondary);
-    }
-
-    dd {
-      flex: 1 1 auto;
-      color: var(--color-text-secondary);
-
-      &:first-of-type.verified {
-        border-top-right-radius: 4px;
-      }
-
-      &:last-of-type.verified {
-        border-bottom-right-radius: 4px;
-      }
-    }
+  .account__header__fields {
+    margin: 0;
+    border: 1px solid var(--background-border-color);
 
     a {
-      color: var(--color-text-brand);
-      text-decoration: none;
-
-      &:hover,
-      &:focus,
-      &:active {
-        text-decoration: underline;
-      }
+      color: $highlight-text-color;
     }
 
-    .verified {
-      border: 1px solid var(--color-border-success-soft);
-      background: var(--color-bg-success-softest);
+    dl:first-child .verified {
+      border-radius: 0 4px 0 0;
+    }
 
-      a {
-        color: var(--color-text-success);
-        font-weight: 500;
-      }
-
-      &__mark {
-        color: var(--color-text-success);
-
-        > svg {
-          vertical-align: middle;
-        }
-      }
+    .verified a {
+      color: $valid-value-color;
     }
   }
 
-  &__content {
+  .account__header__content {
     box-sizing: border-box;
     padding: 20px;
-    color: var(--color-text-primary);
-    font-size: 14px;
-    font-weight: 400;
-    overflow: hidden;
-    word-break: normal;
-    overflow-wrap: break-word;
-
-    p {
-      margin-bottom: 20px;
-      unicode-bidi: plaintext;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    a {
-      color: var(--color-text-brand);
-      text-decoration: none;
-
-      &:hover,
-      &:focus,
-      &:active {
-        text-decoration: underline;
-      }
-    }
+    color: $primary-text-color;
   }
 }
 
@@ -1185,10 +1019,14 @@ a.name-tag,
 .applications-list__item,
 .filters-list__item {
   padding: 15px 0;
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border-primary);
+  background: var(--background-color);
+  border: 1px solid var(--background-border-color);
   border-radius: 4px;
   margin-top: 15px;
+}
+
+.user-role {
+  color: var(--user-role-accent);
 }
 
 .applications-list {
@@ -1199,13 +1037,13 @@ a.name-tag,
 
 .announcements-list,
 .filters-list {
-  border: 1px solid var(--color-border-primary);
+  border: 1px solid var(--background-border-color);
   border-radius: 4px;
   border-bottom: none;
 
   &__item {
     padding: 15px 0;
-    border-bottom: 1px solid var(--color-border-primary);
+    border-bottom: 1px solid var(--background-border-color);
 
     &__title {
       padding: 0 15px;
@@ -1213,25 +1051,37 @@ a.name-tag,
       font-weight: 500;
       font-size: 18px;
       line-height: 1.5;
-      color: var(--color-text-primary);
+      color: $secondary-text-color;
       text-decoration: none;
       margin-bottom: 10px;
 
-      &:where(a):where(:hover, :focus, :active) {
-        color: var(--color-text-brand);
+      &:hover {
+        color: $highlight-text-color;
+      }
+
+      .account-role {
+        vertical-align: middle;
       }
     }
 
     &__description {
       padding: 0 15px;
       display: block;
-      color: var(--color-text-secondary);
+      color: $dark-text-color;
       text-decoration: none;
       margin-bottom: 10px;
     }
 
     .icon {
       vertical-align: middle;
+    }
+
+    a.announcements-list__item__title {
+      &:hover,
+      &:focus,
+      &:active {
+        color: $primary-text-color;
+      }
     }
 
     &__action-bar {
@@ -1247,7 +1097,7 @@ a.name-tag,
 
     &__meta {
       padding: 0 15px;
-      color: var(--color-text-tertiary);
+      color: $dark-text-color;
 
       a {
         color: inherit;
@@ -1290,11 +1140,11 @@ a.name-tag,
 
   &.expired {
     .expiration {
-      color: var(--color-text-error);
+      color: lighten($error-red, 12%);
     }
 
     .permissions-list__item__icon {
-      color: var(--color-text-secondary);
+      color: $dark-text-color;
     }
   }
 }
@@ -1326,7 +1176,7 @@ a.name-tag,
 
   &__table {
     &__number {
-      color: var(--color-bg-primary);
+      color: var(--background-color);
       padding: 10px;
     }
 
@@ -1348,26 +1198,23 @@ a.name-tag,
 
     &__label {
       font-weight: 700;
-      color: var(--color-text-secondary);
+      color: $darker-text-color;
     }
 
     &__box {
       box-sizing: border-box;
-      width: 52px;
-      margin: 1px;
+      background: var(--background-color);
       padding: 10px;
       font-weight: 500;
-      color: var(--color-text-primary);
-      background: var(--color-bg-primary);
+      color: $primary-text-color;
+      width: 52px;
+      margin: 1px;
 
       @for $i from 0 through 10 {
         &--#{10 * $i} {
-          @if $i > 5 {
-            color: var(--color-text-on-brand-base);
-          }
-
-          background-color: rgb(
-            from var(--color-bg-brand-base) r g b / #{math.div(max(1, $i), 10)}
+          background-color: rgba(
+            $ui-highlight-color,
+            1 * (math.div(max(1, $i), 10))
           );
         }
       }
@@ -1378,9 +1225,9 @@ a.name-tag,
 .sparkline {
   display: block;
   text-decoration: none;
-  background: var(--color-bg-primary);
+  background: var(--background-color);
   border-radius: 4px;
-  border: 1px solid var(--color-border-primary);
+  border: 1px solid var(--background-border-color);
   padding: 0;
   position: relative;
   padding-bottom: 55px + 20px;
@@ -1398,22 +1245,22 @@ a.name-tag,
       margin-inline-end: 10px;
       font-weight: 500;
       font-size: 28px;
-      color: var(--color-text-primary);
+      color: $primary-text-color;
     }
 
     &__change {
       display: block;
       font-weight: 500;
       font-size: 18px;
-      color: var(--color-text-secondary);
+      color: $darker-text-color;
       margin-bottom: -3px;
 
       &.positive {
-        color: var(--color-text-success);
+        color: $valid-value-color;
       }
 
       &.negative {
-        color: var(--color-text-error);
+        color: $error-value-color;
       }
     }
   }
@@ -1422,7 +1269,7 @@ a.name-tag,
     padding: 0 20px;
     padding-bottom: 10px;
     text-transform: uppercase;
-    color: var(--color-text-secondary);
+    color: $darker-text-color;
     font-weight: 500;
   }
 
@@ -1437,12 +1284,12 @@ a.name-tag,
     }
 
     path:first-child {
-      fill: var(--color-graph-primary-fill) !important;
+      fill: color.change($highlight-text-color, $alpha: 0.25) !important;
       fill-opacity: 1 !important;
     }
 
     path:last-child {
-      stroke: var(--color-graph-primary-stroke) !important;
+      stroke: lighten($highlight-text-color, 6%) !important;
       fill: none !important;
     }
   }
@@ -1452,17 +1299,17 @@ a.sparkline {
   &:hover,
   &:focus,
   &:active {
-    background: var(--color-bg-brand-softest);
+    background: $ui-base-color;
   }
 }
 
 .skeleton {
-  background-color: var(--color-bg-primary);
+  background-color: var(--background-color);
   background-image: linear-gradient(
     90deg,
-    var(--color-bg-primary),
-    var(--color-bg-secondary),
-    var(--color-bg-primary)
+    lighten($ui-base-color, 8%),
+    lighten($ui-base-color, 12%),
+    lighten($ui-base-color, 8%)
   );
   background-size: 200px 100%;
   background-repeat: no-repeat;
@@ -1493,7 +1340,7 @@ a.sparkline {
   }
 
   &__item {
-    border-bottom: 1px solid var(--color-border-primary);
+    border-bottom: 1px solid lighten($ui-base-color, 4%);
 
     &__key {
       font-weight: 500;
@@ -1502,7 +1349,7 @@ a.sparkline {
 
     &__value {
       text-align: end;
-      color: var(--color-text-secondary);
+      color: $darker-text-color;
       padding: 11px 10px;
     }
 
@@ -1511,13 +1358,14 @@ a.sparkline {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--color-text-brand);
+      background: $ui-highlight-color;
       margin-inline-end: 10px;
 
       @for $i from 0 through 10 {
         &--#{10 * $i} {
-          background-color: rgb(
-            from var(--color-text-brand) r g b / #{math.div(max(1, $i), 10)}
+          background-color: rgba(
+            $ui-highlight-color,
+            1 * (math.div(max(1, $i), 10))
           );
         }
       }
@@ -1528,11 +1376,11 @@ a.sparkline {
     }
 
     &.negative {
-      color: var(--color-text-error);
+      color: $error-value-color;
       font-weight: 700;
 
       .dimension__item__value {
-        color: var(--color-text-error);
+        color: $error-value-color;
       }
     }
   }
@@ -1540,12 +1388,12 @@ a.sparkline {
 
 .report-reason-selector {
   border-radius: 4px;
-  background: var(--color-bg-primary);
+  background: var(--background-color);
   margin-bottom: 20px;
 
   &__category {
     cursor: pointer;
-    border-bottom: 1px solid var(--color-border-primary);
+    border-bottom: 1px solid darken($ui-base-color, 8%);
 
     &__label {
       padding: 15px;
@@ -1575,7 +1423,7 @@ a.sparkline {
 
   &__details {
     &__item {
-      border-bottom: 1px solid var(--color-border-primary);
+      border-bottom: 1px solid var(--background-border-color);
       padding: 15px 0;
 
       &:last-child {
@@ -1606,7 +1454,7 @@ a.sparkline {
 
 .account-card {
   border-radius: 4px;
-  border: 1px solid var(--color-border-primary);
+  border: 1px solid var(--background-border-color);
   position: relative;
 
   &__warning-badge {
@@ -1618,7 +1466,7 @@ a.sparkline {
     background:
       url('@/images/warning-stripes.svg') repeat-y left,
       url('@/images/warning-stripes.svg') repeat-y right,
-      var(--color-bg-primary);
+      var(--background-color);
   }
 
   &__permalink {
@@ -1637,7 +1485,7 @@ a.sparkline {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      background: var(--color-bg-secondary);
+      background: darken($ui-base-color, 8%);
     }
   }
 
@@ -1655,21 +1503,21 @@ a.sparkline {
         margin: 0;
         width: 56px;
         height: 56px;
-        background-color: var(--color-bg-secondary);
+        background-color: darken($ui-base-color, 8%);
         border-radius: 8px;
-        border: 1px solid var(--color-border-media);
+        border: 1px solid $ui-base-color;
       }
     }
 
     .display-name {
-      color: var(--color-text-secondary);
+      color: $darker-text-color;
       padding-bottom: 15px;
       font-size: 15px;
       line-height: 20px;
 
       bdi {
         display: block;
-        color: var(--color-text-primary);
+        color: $primary-text-color;
         font-weight: 700;
       }
     }
@@ -1698,7 +1546,7 @@ a.sparkline {
     }
 
     a {
-      color: var(--color-text-primary);
+      color: $secondary-text-color;
       text-decoration: none;
       unicode-bidi: isolate;
 
@@ -1749,14 +1597,14 @@ a.sparkline {
     &__item {
       padding: 15px 0;
       text-align: center;
-      color: var(--color-text-primary);
+      color: $primary-text-color;
       font-weight: 600;
       font-size: 15px;
       line-height: 21px;
 
       small {
         display: block;
-        color: var(--color-text-secondary);
+        color: $darker-text-color;
         font-weight: 400;
         font-size: 13px;
         line-height: 18px;
@@ -1769,11 +1617,11 @@ a.sparkline {
   margin-bottom: 20px;
 
   &__item {
-    background: var(--color-bg-primary);
+    background: var(--background-color);
     position: relative;
     padding: 15px;
     padding-inline-start: 15px * 2 + 40px;
-    border: 1px solid var(--color-border-primary);
+    border: 1px solid var(--background-border-color);
 
     &:first-child {
       border-top-left-radius: 4px;
@@ -1795,13 +1643,13 @@ a.sparkline {
     }
 
     &__header {
-      color: var(--color-text-secondary);
+      color: $darker-text-color;
       font-size: 15px;
       line-height: 20px;
       margin-bottom: 4px;
 
       .username {
-        color: var(--color-text-primary);
+        color: $primary-text-color;
         font-weight: 500;
         margin-inline-end: 5px;
 
@@ -1818,7 +1666,7 @@ a.sparkline {
       }
 
       a.timestamp {
-        color: var(--color-text-secondary);
+        color: $darker-text-color;
         text-decoration: none;
 
         &:hover,
@@ -1839,7 +1687,7 @@ a.sparkline {
       line-height: 20px;
       overflow-wrap: break-word;
       font-weight: 400;
-      color: var(--color-text-primary);
+      color: $primary-text-color;
 
       p {
         margin-bottom: 20px;
@@ -1852,7 +1700,7 @@ a.sparkline {
       }
 
       a {
-        color: var(--color-text-brand);
+        color: $highlight-text-color;
         text-decoration: none;
 
         &:hover {
@@ -1896,7 +1744,7 @@ a.sparkline {
     &__description {
       padding: 15px;
       font-size: 14px;
-      color: var(--color-text-tertiary);
+      color: $dark-text-color;
     }
   }
 
@@ -1920,33 +1768,11 @@ a.sparkline {
   }
 }
 
-.navigation-skip-link {
-  position: fixed;
-  z-index: 100;
-  margin: 10px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 15px;
-  color: var(--color-text-primary);
-  background: var(--color-bg-primary);
-  box-shadow: var(--dropdown-shadow);
-
-  /* Hide visually when not focused */
-  &:not(:focus-within) {
-    width: 1px;
-    height: 1px;
-    margin: 0;
-    padding: 0;
-    clip-path: inset(50%);
-    overflow: hidden;
-  }
-}
-
 .section-skip-link {
   float: right;
 
   a {
-    color: var(--color-text-brand);
+    color: $ui-highlight-color;
     text-decoration: none;
 
     &:hover,
@@ -1963,14 +1789,14 @@ a.sparkline {
   line-height: 20px;
   overflow-wrap: break-word;
   font-weight: 400;
-  color: var(--color-text-primary);
+  color: $primary-text-color;
   box-sizing: border-box;
   min-height: 100%;
-  border: 1px solid var(--color-border-primary);
+  border: 1px solid var(--background-border-color);
   border-radius: 4px;
 
   a {
-    color: var(--color-text-brand);
+    color: $highlight-text-color;
     text-decoration: none;
 
     &:hover {
@@ -1995,34 +1821,34 @@ a.sparkline {
     list-style: disc;
     padding-inline-start: 15px;
     margin-bottom: 20px;
-    color: var(--color-text-secondary);
+    color: $darker-text-color;
 
     &:last-child {
       margin-bottom: 0;
     }
 
     &__text {
-      color: var(--color-text-primary);
+      color: $primary-text-color;
     }
   }
 
   &__statuses-list {
     border-radius: 4px;
-    border: 1px solid var(--color-border-primary);
+    border: 1px solid var(--background-border-color);
     font-size: 13px;
     line-height: 18px;
     overflow: hidden;
 
     &__item {
       padding: 16px;
-      border-bottom: 1px solid var(--color-border-primary);
+      border-bottom: 1px solid var(--background-border-color);
 
       &:last-child {
         border-bottom: 0;
       }
 
       &__meta {
-        color: var(--color-text-secondary);
+        color: $darker-text-color;
       }
 
       a {
@@ -2059,16 +1885,16 @@ a.sparkline {
       flex: 0 0 auto;
       width: 4px;
       height: 21px;
-      background: var(--color-bg-secondary);
+      background: lighten($ui-base-color, 8%);
       margin: 0 2px;
       border-radius: 2px;
 
       &.positive {
-        background: var(--color-bg-success-base);
+        background: $valid-value-color;
       }
 
       &.negative {
-        background: var(--color-bg-error-base);
+        background: $error-value-color;
       }
     }
   }
@@ -2097,9 +1923,9 @@ a.sparkline {
       align-items: center;
       width: calc(1.375rem + 1px);
       height: calc(1.375rem + 1px);
-      background: var(--color-bg-primary);
-      border: 1px solid var(--color-border-brand);
-      color: var(--color-text-brand);
+      background: $ui-base-color;
+      border: 1px solid $highlight-text-color;
+      color: $highlight-text-color;
       border-radius: 8px;
     }
 
@@ -2107,7 +1933,7 @@ a.sparkline {
       position: absolute;
       content: '';
       width: 1px;
-      background: var(--color-text-brand);
+      background: $highlight-text-color;
       bottom: 0;
       top: calc(1.875rem + 1px);
       inset-inline-start: 0.6875rem;
@@ -2125,14 +1951,14 @@ a.sparkline {
   &__entry {
     h5 {
       font-weight: 500;
-      color: var(--color-text-primary);
+      color: $primary-text-color;
       line-height: 25px;
       margin-bottom: 16px;
     }
 
     .status {
-      border: 1px solid var(--color-border-primary);
-      background: var(--color-bg-secondary);
+      border: 1px solid lighten($ui-base-color, 4%);
+      background: $ui-base-color;
       border-radius: 4px;
     }
   }
@@ -2145,8 +1971,8 @@ a.sparkline {
   line-height: 20px;
   overflow-wrap: break-word;
   font-weight: 400;
-  border: 1px solid var(--color-border-primary);
-  color: var(--color-text-primary);
+  border: 1px solid lighten($ui-base-color, 4%);
+  color: $primary-text-color;
   box-sizing: border-box;
   min-height: 100%;
 
@@ -2181,9 +2007,9 @@ a.sparkline {
     summary {
       display: block;
       box-sizing: border-box;
-      color: var(--color-text-primary);
-      background: var(--color-bg-brand-softest);
-      border: 1px solid var(--color-border-brand-soft);
+      background: var(--nested-card-background);
+      color: var(--nested-card-text);
+      border: var(--nested-card-border);
       border-radius: 8px;
       padding: 8px 13px;
       position: relative;
@@ -2197,7 +2023,7 @@ a.sparkline {
         display: block;
         font-size: 15px;
         line-height: 20px;
-        color: var(--color-text-brand);
+        color: $highlight-text-color;
         cursor: pointer;
         border: 0;
         background: transparent;
@@ -2240,7 +2066,7 @@ a.sparkline {
     }
 
     .spoiler-button__overlay__label {
-      outline: 1px solid var(--color-border-media);
+      outline: 1px solid var(--media-outline-color);
     }
 
     .hide-button {
@@ -2249,11 +2075,11 @@ a.sparkline {
       position: absolute;
       top: 5px;
       right: 5px;
-      color: var(--color-text-on-media);
-      background: var(--color-bg-media);
-      backdrop-filter: $backdrop-blur-filter;
-      outline: 1px solid var(--color-border-media);
+      color: $white;
       border: 0;
+      outline: 1px solid var(--media-outline-color);
+      background-color: color.change($black, $alpha: 0.45);
+      backdrop-filter: $backdrop-blur-filter;
       padding: 3px 12px;
       border-radius: 99px;
       font-size: 14px;
@@ -2262,7 +2088,7 @@ a.sparkline {
 
       &:hover,
       &:focus {
-        background-color: rgb(from var(--color-bg-media-base) r g b / 90%);
+        background-color: color.change($black, $alpha: 0.9);
       }
     }
 
@@ -2290,23 +2116,23 @@ a.sparkline {
 .admin {
   &__terms-of-service {
     &__container {
-      background: var(--color-bg-tertiary);
+      background: var(--surface-background-color);
       border-radius: 8px;
-      border: 1px solid var(--color-border-primary);
+      border: 1px solid var(--background-border-color);
       overflow: hidden;
 
       &__header {
         padding: 16px;
         font-size: 14px;
         line-height: 20px;
-        color: var(--color-text-primary);
+        color: $secondary-text-color;
         display: flex;
         align-items: center;
         gap: 12px;
       }
 
       &__body {
-        background: var(--color-bg-primary);
+        background: var(--background-color);
         padding: 16px;
         overflow-y: scroll;
         height: 30vh;
@@ -2315,7 +2141,7 @@ a.sparkline {
 
     &__history {
       & > li {
-        border-bottom: 1px solid var(--color-border-primary);
+        border-bottom: 1px solid var(--background-border-color);
 
         &:last-child {
           border-bottom: 0;
@@ -2353,170 +2179,14 @@ a.sparkline {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--color-text-tertiary);
+    background: $dark-text-color;
   }
 
   &.success {
-    color: var(--color-text-success);
+    color: $valid-value-color;
 
     .dot-indicator__indicator {
-      background-color: var(--color-bg-success-base);
-    }
-  }
-}
-
-.subheading-with-action {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 16px;
-
-  &__subheading {
-    flex-grow: 1;
-  }
-
-  h3 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-
-  p {
-    font-size: 16px;
-  }
-}
-
-.actions-list {
-  &__item {
-    border-bottom: 1px solid var(--color-border-primary);
-    padding: 12px 0;
-    display: flex;
-    gap: 16px;
-    align-items: center;
-
-    &__label {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
-      &__label {
-        font-weight: 600;
-        font-size: 15px;
-      }
-
-      &__hint {
-        font-size: 13px;
-        color: var(--color-text-secondary);
-      }
-    }
-
-    &__action {
-      flex-shrink: 0;
-    }
-  }
-}
-
-.empty-state {
-  border: 1px solid var(--color-border-primary);
-  border-radius: 12px;
-  padding: 24px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-
-  &__title-and-description {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-    line-height: 21px;
-    font-size: 15px;
-    text-align: center;
-
-    &__title {
-      font-weight: 600;
-    }
-  }
-
-  svg {
-    width: 200px;
-  }
-
-  // FIXME: This is duplicated with empty_message.module.scss
-  [data-color-scheme='dark'] & svg {
-    --color-skin-1: #3a3a50;
-    --color-skin-2: #67678e;
-    --color-skin-3: #44445f;
-    --color-outline: #21212c;
-    --color-shadow: #181820;
-    --color-highlight: #b2b1c8;
-  }
-}
-
-.heading-with-lead {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  h1 {
-    font-size: 28px;
-    font-weight: 600;
-  }
-
-  .lead {
-    font-size: 18px;
-    color: var(--color-text-secondary);
-  }
-}
-
-.status-badge {
-  display: inline-flex;
-  padding: 3px 4px;
-  border-radius: 8px;
-  background: var(--color-bg-success-softest);
-  font-size: 13px;
-  font-weight: 600;
-
-  &.positive {
-    background: var(--color-bg-success-softest);
-  }
-
-  &.negative {
-    background: var(--color-bg-error-softest);
-  }
-}
-
-.metadata {
-  display: flex;
-  gap: 40px;
-  margin: 16px 0;
-
-  & > div {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  dt {
-    font-size: 13px;
-    color: var(--color-text-secondary);
-  }
-
-  dd {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 22.4px;
-
-    .status-badge {
-      box-sizing: border-box;
-      padding: 4px;
-      font-size: inherit;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background-color: $valid-value-color;
     }
   }
 }

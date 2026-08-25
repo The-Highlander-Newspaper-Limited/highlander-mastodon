@@ -29,7 +29,7 @@ module Admin
         log_action :create, @category
         redirect_to admin_categories_path
       else
-        render :new, status: 422
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -40,7 +40,7 @@ module Admin
         log_action :update, @category
         redirect_to admin_categories_path
       else
-        render :edit, status: 422
+        render :edit, status: :unprocessable_entity
       end
     end
 

@@ -85,8 +85,6 @@ export function fetchStatus(id, {
       dispatch(fetchStatusSuccess(skipLoading));
     }).catch(error => {
       dispatch(fetchStatusFail(id, error, skipLoading, parentQuotePostId));
-      if (error.status === 404)
-        dispatch(deleteFromTimelines(id));
     });
   };
 }
@@ -109,15 +107,14 @@ export function fetchStatusFail(id, error, skipLoading, parentQuotePostId) {
   };
 }
 
-export function redraft(status, raw_text, quoted_status_id = null) {
+export function redraft(status, raw_text) {
   return (dispatch, getState) => {
-    const maxOptions = getState().server.server.item?.configuration.polls.max_options;
+    const maxOptions = getState().server.getIn(['server', 'configuration', 'polls', 'max_options']);
 
     dispatch({
       type: REDRAFT,
       status,
       raw_text,
-      quoted_status_id,
       maxOptions,
     });
   };
@@ -170,7 +167,7 @@ export function deleteStatus(id, withRedraft = false) {
       dispatch(importFetchedAccount(response.data.account));
 
       if (withRedraft) {
-        dispatch(redraft(status, response.data.text, response.data.quote?.quoted_status?.id));
+        dispatch(redraft(status, response.data.text));
         ensureComposeIsVisible(getState);
       } else {
         dispatch(showAlert({ message: messages.deleteSuccess }));
@@ -206,8 +203,8 @@ export function deleteStatusFail(id, error) {
   };
 }
 
-export const updateStatus = (status, { bogusQuotePolicy }) => dispatch =>
-  dispatch(importFetchedStatus(status, { bogusQuotePolicy }));
+export const updateStatus = status => dispatch =>
+  dispatch(importFetchedStatus(status));
 
 export function muteStatus(id) {
   return (dispatch) => {

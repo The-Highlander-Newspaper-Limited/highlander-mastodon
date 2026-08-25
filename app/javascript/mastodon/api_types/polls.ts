@@ -9,7 +9,7 @@ export interface ApiPollOptionJSON {
 
 export interface ApiPollJSON {
   id: string;
-  expires_at: string | null;
+  expires_at: string;
   expired: boolean;
   multiple: boolean;
   votes_count: number;

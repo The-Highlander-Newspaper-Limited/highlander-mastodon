@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
 import { withRouter } from 'react-router-dom';
 
@@ -24,12 +24,10 @@ import { Dropdown } from 'mastodon/components/dropdown_menu';
 import { me, quickBoosting } from '../../initial_state';
 
 import { IconButton } from '../icon_button';
-import { injectIntl } from '../intl';
 import { BoostButton } from '../status/boost_button';
 import { RemoveQuoteHint } from './remove_quote_hint';
 import { quoteItemState, selectStatusState } from '../status/boost_button_utils';
 import composeOverride from 'mastodon/lib/compose_override';
-
 
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
@@ -130,7 +128,7 @@ class StatusActionBar extends ImmutablePureComponent {
     if (signedIn) {
       this.props.onReply(this.props.status);
     } else {
-      this.props.onInteractionModal(this.props.status, 'reply');
+      this.props.onInteractionModal(this.props.status);
     }
   };
 
@@ -152,7 +150,7 @@ class StatusActionBar extends ImmutablePureComponent {
     if (signedIn) {
       this.props.onFavourite(this.props.status);
     } else {
-      this.props.onInteractionModal(this.props.status, 'favourite');
+      this.props.onInteractionModal(this.props.status);
     }
   };
 
@@ -391,7 +389,7 @@ class StatusActionBar extends ImmutablePureComponent {
     const bookmarkTitle = intl.formatMessage(status.get('bookmarked') ? messages.removeBookmark : messages.bookmark);
     const favouriteTitle = intl.formatMessage(status.get('favourited') ? messages.removeFavourite : messages.favourite);
     const isReply = status.get('in_reply_to_account_id') === status.getIn(['account', 'id']);
-
+  
     const shouldShowQuoteRemovalHint = isQuotingMe && contextType === 'notifications';
 
     return (
@@ -419,21 +417,16 @@ class StatusActionBar extends ImmutablePureComponent {
             <Dropdown
               scrollKey={scrollKey}
               status={status}
-              needsStatusRefresh={quickBoosting && status.get('quote_approval') === null}
               items={menu}
+              icon='ellipsis-h'
+              iconComponent={MoreHorizIcon}
               direction='right'
+              title={intl.formatMessage(messages.more)}
               onOpen={() => {
                 dismissQuoteHint();
                 return true;
               }}
-            >
-              <IconButton
-                className='status__action-bar__button'
-                icon='ellipsis-h'
-                iconComponent={MoreHorizIcon}
-                title={intl.formatMessage(messages.more)}
-              />
-            </Dropdown>
+            />
           )}
         </RemoveQuoteHint>
       </div>

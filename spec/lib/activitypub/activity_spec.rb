@@ -34,8 +34,6 @@ RSpec.describe ActivityPub::Activity do
       }
     end
 
-    let(:publication_date) { 1.hour.ago.utc }
-
     let(:create_json) do
       {
         '@context': [
@@ -54,7 +52,7 @@ RSpec.describe ActivityPub::Activity do
             'https://www.w3.org/ns/activitystreams#Public',
           ],
           content: 'foo',
-          published: publication_date.iso8601,
+          published: '2025-05-24T11:03:10Z',
           quote: ActivityPub::TagManager.instance.uri_for(quoted_status),
         },
       }.deep_stringify_keys
@@ -79,7 +77,7 @@ RSpec.describe ActivityPub::Activity do
             'https://www.w3.org/ns/activitystreams#Public',
           ],
           content: 'foo',
-          published: publication_date.iso8601,
+          published: '2025-05-24T11:03:10Z',
           quote: ActivityPub::TagManager.instance.uri_for(quoted_status),
           quoteAuthorization: approval_uri,
         },
@@ -89,7 +87,7 @@ RSpec.describe ActivityPub::Activity do
     before do
       sender.update(uri: ActivityPub::TagManager.instance.uri_for(sender))
 
-      stub_request(:get, approval_uri).to_return(headers: { 'Content-Type': 'application/activity+json' }, body: approval_payload.to_json)
+      stub_request(:get, approval_uri).to_return(headers: { 'Content-Type': 'application/activity+json' }, body: Oj.dump(approval_payload))
     end
 
     context 'when getting them in order' do

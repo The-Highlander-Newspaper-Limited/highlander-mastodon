@@ -1,15 +1,14 @@
 import PropTypes from 'prop-types';
 
-import { defineMessages } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 
-import { Helmet } from '@unhead/react/helmet';
+import { Helmet } from 'react-helmet';
 
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { connect } from 'react-redux';
 
 import PushPinIcon from '@/material-icons/400-24px/push_pin.svg?react';
-import { injectIntl } from '@/mastodon/components/intl';
 import { getStatusList } from 'mastodon/selectors';
 
 import { fetchPinnedStatuses } from '../../actions/pin_statuses';
@@ -35,7 +34,7 @@ class PinnedStatuses extends ImmutablePureComponent {
     multiColumn: PropTypes.bool,
   };
 
-  componentDidMount () {
+  UNSAFE_componentWillMount () {
     this.props.dispatch(fetchPinnedStatuses());
   }
 

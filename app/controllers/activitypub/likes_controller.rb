@@ -22,7 +22,7 @@ class ActivityPub::LikesController < ActivityPub::BaseController
   def set_status
     @status = @account.statuses.find(params[:status_id])
     authorize @status, :show?
-  rescue ActiveRecord::RecordNotFound, Mastodon::NotPermittedError
+  rescue Mastodon::NotPermittedError
     not_found
   end
 

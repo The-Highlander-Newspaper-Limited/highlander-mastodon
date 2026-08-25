@@ -44,9 +44,6 @@ const hotkeyTest: Story['play'] = async ({ canvas, userEvent }) => {
   await userEvent.keyboard('gh');
   await confirmHotkey('goToHome');
 
-  await userEvent.keyboard('ge');
-  await confirmHotkey('goToExplore');
-
   await userEvent.keyboard('gn');
   await confirmHotkey('goToNotifications');
 
@@ -97,9 +94,6 @@ export const Default = {
       goToHome: () => {
         setMatchedHotkey('goToHome');
       },
-      goToExplore: () => {
-        setMatchedHotkey('goToExplore');
-      },
       goToNotifications: () => {
         setMatchedHotkey('goToNotifications');
       },
@@ -146,7 +140,7 @@ export const Default = {
             the app.
           </p>
           <p>
-            When a <button type='button'>Button</button> is focused,
+            When a <button>Button</button> is focused,
             <kbd>Enter</kbd>
             should not trigger open, but <kbd>o</kbd>
             should.

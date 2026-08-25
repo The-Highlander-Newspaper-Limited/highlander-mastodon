@@ -3,14 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe REST::AccountSerializer, type: :serializer do
-  subject do
-    serialized_record_json(account, described_class, options: {
-      scope: current_user,
-      scope_name: :current_user,
-    })
-  end
+  subject { serialized_record_json(account, described_class) }
 
-  let(:current_user) { nil }
   let(:role) { Fabricate(:user_role, permissions: UserRole::FLAGS[:create_statuses]) }
   let(:user) { Fabricate(:user, role: role) }
   let(:account) { user.account }

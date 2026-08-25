@@ -31,7 +31,7 @@ class TextFormatter
   end
 
   def to_s
-    return add_quote_fallback('').html_safe if text.blank? # rubocop:disable Rails/OutputSafety
+    return ''.html_safe if text.blank?
 
     html = rewrite do |entity|
       if entity[:url]
@@ -75,15 +75,6 @@ class TextFormatter
       end
     rescue Addressable::URI::InvalidURIError, IDN::Idna::IdnaError
       h(url)
-    end
-
-    def link_to_mention(account, with_domain: false)
-      url = ActivityPub::TagManager.instance.url_for(account)
-      display_username = with_domain ? account.pretty_acct : account.username
-
-      <<~HTML.squish
-        <span class="h-card" translate="no"><a href="#{h(url)}" class="u-url mention">@<span>#{h(display_username)}</span></a></span>
-      HTML
     end
   end
 
@@ -145,7 +136,12 @@ class TextFormatter
 
     return "@#{h(entity[:screen_name])}" if account.nil?
 
-    TextFormatter.link_to_mention(account, with_domain: same_username_hits&.positive? || with_domains?)
+    url = ActivityPub::TagManager.instance.url_for(account)
+    display_username = same_username_hits&.positive? || with_domains? ? account.pretty_acct : account.username
+
+    <<~HTML.squish
+      <span class="h-card" translate="no"><a href="#{h(url)}" class="u-url mention">@<span>#{h(display_username)}</span></a></span>
+    HTML
   end
 
   def entity_cache

@@ -1,10 +1,8 @@
 import { createPollFromServerJSON } from 'mastodon/models/poll';
 
 import { importAccounts } from './accounts';
-import { importCustomEmoji } from './emoji';
 import { normalizeStatus } from './normalizer';
 import { importPolls } from './polls';
-import { fetchAccountsForCollectionPreview } from '@/mastodon/reducers/slices/collections';
 
 export const STATUS_IMPORT   = 'STATUS_IMPORT';
 export const STATUSES_IMPORT = 'STATUSES_IMPORT';
@@ -41,10 +39,6 @@ export function importFetchedAccounts(accounts) {
     if (account.moved) {
       processAccount(account.moved);
     }
-
-    if (account.emojis && account.username === account.acct) {
-      importCustomEmoji(account.emojis);
-    }
   }
 
   accounts.forEach(processAccount);
@@ -52,20 +46,19 @@ export function importFetchedAccounts(accounts) {
   return importAccounts({ accounts: normalAccounts });
 }
 
-export function importFetchedStatus(status, options = {}) {
-  return importFetchedStatuses([status], options);
+export function importFetchedStatus(status) {
+  return importFetchedStatuses([status]);
 }
 
-export function importFetchedStatuses(statuses, options = {}) {
+export function importFetchedStatuses(statuses) {
   return (dispatch, getState) => {
     const accounts = [];
     const normalStatuses = [];
     const polls = [];
     const filters = [];
-    const collections = [];
 
     function processStatus(status) {
-      pushUnique(normalStatuses, normalizeStatus(status, getState().getIn(['statuses', status.id]), options));
+      pushUnique(normalStatuses, normalizeStatus(status, getState().getIn(['statuses', status.id])));
       pushUnique(accounts, status.account);
 
       if (status.filtered) {
@@ -84,16 +77,8 @@ export function importFetchedStatuses(statuses, options = {}) {
         pushUnique(polls, createPollFromServerJSON(status.poll, getState().polls[status.poll.id]));
       }
 
-      if (status.tagged_collections.length) {
-        status.tagged_collections.forEach(collection => pushUnique(collections, collection));
-      }
-
       if (status.card) {
         status.card.authors.forEach(author => author.account && pushUnique(accounts, author.account));
-      }
-
-      if (status.emojis && status.account.username === status.account.acct) {
-        importCustomEmoji(status.emojis);
       }
     }
 
@@ -103,6 +88,5 @@ export function importFetchedStatuses(statuses, options = {}) {
     dispatch(importFetchedAccounts(accounts));
     dispatch(importStatuses(normalStatuses));
     dispatch(importFilters(filters));
-    fetchAccountsForCollectionPreview(collections, dispatch);
   };
 }

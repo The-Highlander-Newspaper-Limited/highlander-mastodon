@@ -13,16 +13,23 @@ RSpec.describe 'Settings preferences appearance page' do
     expect(page)
       .to have_private_cache_control
 
+    select 'contrast', from: theme_selection_field
+
     check advanced_layout_field
 
     expect { save_changes }
-      .to(change { user.reload.settings['web.advanced_layout'] }.to(true))
+      .to change { user.reload.settings.theme }.to('contrast')
+      .and(change { user.reload.settings['web.advanced_layout'] }.to(true))
     expect(page)
       .to have_title(I18n.t('settings.appearance'))
   end
 
   def save_changes
     within('form') { click_on submit_button }
+  end
+
+  def theme_selection_field
+    form_label('defaults.setting_theme')
   end
 
   def advanced_layout_field

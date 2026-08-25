@@ -17,7 +17,7 @@
   },
   "test": {
     "autoBuild": true,
-    "publicOutputDir": "packs",
+    "publicOutputDir": "packs-test",
     "port": 3037
   }
 }

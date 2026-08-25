@@ -46,10 +46,10 @@ interface MediaModalProps {
   volume?: number;
 }
 
-const MIN_SWIPE_DISTANCE = 400;
-const isLtrDir = getComputedStyle(document.body).direction !== 'rtl';
-
-export const MediaModal = forwardRef<HTMLDivElement, MediaModalProps>(
+export const MediaModal: FC<MediaModalProps> = forwardRef<
+  HTMLDivElement,
+  MediaModalProps
+>(
   (
     {
       media,
@@ -62,83 +62,42 @@ export const MediaModal = forwardRef<HTMLDivElement, MediaModalProps>(
       statusId,
       onChangeBackgroundColor,
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- _ref is required to keep the ref forwarding working
     _ref,
   ) => {
     const [index, setIndex] = useState(startIndex);
-    const [zoomedIn, setZoomedIn] = useState(false);
     const currentMedia = media.get(index);
 
-    const sign = isLtrDir ? '-' : '';
-
-    const [wrapperStyles, api] = useSpring(() => ({
-      x: `${sign}${index * 100}%`,
-    }));
-
     const handleChangeIndex = useCallback(
-      (newIndex: number, animate = false) => {
+      (newIndex: number) => {
         if (newIndex < 0) {
           newIndex = media.size + newIndex;
-        } else if (newIndex >= media.size) {
-          newIndex = newIndex % media.size;
         }
-        setIndex(newIndex);
+        setIndex(newIndex % media.size);
         setZoomedIn(false);
-        if (animate) {
-          void api.start({
-            x: `calc(${sign}${newIndex * 100}% + 0px)`,
-          });
-        }
       },
-      [api, media.size, sign],
+      [media.size],
     );
     const handlePrevClick = useCallback(() => {
-      handleChangeIndex(index - 1, true);
+      handleChangeIndex(index - 1);
     }, [handleChangeIndex, index]);
     const handleNextClick = useCallback(() => {
-      handleChangeIndex(index + 1, true);
+      handleChangeIndex(index + 1);
     }, [handleChangeIndex, index]);
 
     const handleKeyDown = useCallback(
       (event: KeyboardEvent) => {
-        const prevKey = isLtrDir ? 'ArrowLeft' : 'ArrowRight';
-        const nextKey = isLtrDir ? 'ArrowRight' : 'ArrowLeft';
-
-        if (event.key === prevKey) {
+        if (event.key === 'ArrowLeft') {
           handlePrevClick();
           event.preventDefault();
           event.stopPropagation();
-        } else if (event.key === nextKey) {
+        } else if (event.key === 'ArrowRight') {
           handleNextClick();
           event.preventDefault();
           event.stopPropagation();
         }
       },
       [handleNextClick, handlePrevClick],
-    );
-
-    const bind = useDrag(
-      ({ active, movement: [mx], direction: [xDir], cancel }) => {
-        // Disable swipe when zoomed in.
-        if (zoomedIn) {
-          return;
-        }
-
-        // If dragging and swipe distance is enough, change the index.
-        if (
-          active &&
-          Math.abs(mx) > Math.min(window.innerWidth / 4, MIN_SWIPE_DISTANCE)
-        ) {
-          handleChangeIndex(isLtrDir ? index - xDir : index + xDir);
-          cancel();
-        }
-        // Set the x position via calc to ensure proper centering regardless of screen size.
-        const x = active ? mx : 0;
-        const operator = isLtrDir ? '+' : '-';
-        void api.start({
-          x: `calc(${sign}${index * 100}% ${operator} ${x}px)`,
-        });
-      },
-      { pointer: { capture: false } },
     );
 
     useEffect(() => {
@@ -157,33 +116,22 @@ export const MediaModal = forwardRef<HTMLDivElement, MediaModalProps>(
           onChangeBackgroundColor(backgroundColor);
         }
       }
-      return () => {
-        onChangeBackgroundColor(null);
-      };
     }, [currentMedia, onChangeBackgroundColor]);
 
     const [viewportDimensions, setViewportDimensions] = useState<{
       width: number;
       height: number;
     }>({ width: 0, height: 0 });
-    const handleRef: RefCallback<HTMLDivElement> = useCallback(
-      (ele) => {
-        if (typeof _ref === 'function') {
-          _ref(ele);
-        } else if (_ref) {
-          _ref.current = ele;
-        }
+    const handleRef: RefCallback<HTMLDivElement> = useCallback((ele) => {
+      if (ele?.clientWidth && ele.clientHeight) {
+        setViewportDimensions({
+          width: ele.clientWidth,
+          height: ele.clientHeight,
+        });
+      }
+    }, []);
 
-        if (ele?.clientWidth && ele.clientHeight) {
-          setViewportDimensions({
-            width: ele.clientWidth,
-            height: ele.clientHeight,
-          });
-        }
-      },
-      [_ref],
-    );
-
+    const [zoomedIn, setZoomedIn] = useState(false);
     const zoomable =
       currentMedia?.get('type') === 'image' &&
       ((currentMedia.getIn(['meta', 'original', 'width']) as number) >
@@ -193,6 +141,17 @@ export const MediaModal = forwardRef<HTMLDivElement, MediaModalProps>(
     const handleZoomClick = useCallback(() => {
       setZoomedIn((prev) => !prev);
     }, []);
+
+    const wrapperStyles = useSpring({
+      x: `-${index * 100}%`,
+    });
+    const bind = useDrag(
+      ({ swipe: [swipeX] }) => {
+        if (swipeX === 0) return;
+        handleChangeIndex(index + swipeX * -1); // Invert swipe as swiping left loads the next slide.
+      },
+      { pointer: { capture: false } },
+    );
 
     const [navigationHidden, setNavigationHidden] = useState(false);
     const handleToggleNavigation = useCallback(() => {
@@ -282,22 +241,22 @@ export const MediaModal = forwardRef<HTMLDivElement, MediaModalProps>(
 
     const intl = useIntl();
 
-    const prevNav = media.size > 1 && (
+    const leftNav = media.size > 1 && (
       <button
+        tabIndex={0}
         className='media-modal__nav media-modal__nav--prev'
         onClick={handlePrevClick}
         aria-label={intl.formatMessage(messages.previous)}
-        type='button'
       >
         <Icon id='chevron-left' icon={ChevronLeftIcon} />
       </button>
     );
-    const nextNav = media.size > 1 && (
+    const rightNav = media.size > 1 && (
       <button
+        tabIndex={0}
         className='media-modal__nav  media-modal__nav--next'
         onClick={handleNextClick}
         aria-label={intl.formatMessage(messages.next)}
-        type='button'
       >
         <Icon id='chevron-right' icon={ChevronRightIcon} />
       </button>
@@ -342,8 +301,8 @@ export const MediaModal = forwardRef<HTMLDivElement, MediaModalProps>(
             />
           </div>
 
-          {prevNav}
-          {nextNav}
+          {leftNav}
+          {rightNav}
 
           <div className='media-modal__overlay'>
             <MediaPagination
@@ -395,7 +354,6 @@ const MediaPagination: FC<MediaPaginationProps> = ({
             active: i === index,
           })}
           onClick={handleChangeIndex(i)}
-          type='button'
         >
           {i + 1}
         </button>

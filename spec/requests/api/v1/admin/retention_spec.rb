@@ -3,14 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'Admin Retention' do
-  include_context 'with API authentication', user_fabricator: :admin_user
-
+  let(:user)    { Fabricate(:admin_user) }
+  let(:token)   { Fabricate(:accessible_access_token, resource_owner_id: user.id, scopes: scopes) }
+  let(:headers) { { 'Authorization' => "Bearer #{token.token}" } }
   let(:account) { Fabricate(:account) }
 
   describe 'GET /api/v1/admin/retention' do
     context 'when not authorized' do
       it 'returns http forbidden' do
-        post '/api/v1/admin/retention', params: { start_at: '2025-01-04', end_at: '2025-07-05', frequency: 'month' }
+        post '/api/v1/admin/retention', params: { account_id: account.id, limit: 2 }
 
         expect(response)
           .to have_http_status(403)
@@ -23,7 +24,7 @@ RSpec.describe 'Admin Retention' do
       let(:scopes) { 'admin:read' }
 
       it 'returns http success and status json' do
-        post '/api/v1/admin/retention', params: { start_at: '2025-01-04', end_at: '2025-07-05', frequency: 'month' }, headers: headers
+        post '/api/v1/admin/retention', params: { account_id: account.id, limit: 2 }, headers: headers
 
         expect(response)
           .to have_http_status(200)

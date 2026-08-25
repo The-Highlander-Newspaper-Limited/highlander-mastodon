@@ -123,12 +123,12 @@ module Mastodon::CLI
         progress.log("Moving #{previous_path} to #{upgraded_path}") if options[:verbose]
 
         begin
-          move_previous_to_upgraded(previous_path, upgraded_path)
+          move_previous_to_upgraded
         rescue => e
           progress.log(pastel.red("Error processing #{previous_path}: #{e}"))
           success = false
 
-          remove_directory(upgraded_path)
+          remove_directory
         end
       end
 

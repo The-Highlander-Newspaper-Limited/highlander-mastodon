@@ -63,11 +63,10 @@ product behavior in this repository intentionally differs from upstream.
 
 ## Requirements
 
-- **Ruby** 3.3+
-- **PostgreSQL** 14+
-- **Redis** 7.0+
-- **Node.js** 22+
-- **FFmpeg** 5.1+
+- Ruby 3.2+
+- PostgreSQL 14+
+- Redis 7.0+
+- Node.js 20+
 
 ## Development
 

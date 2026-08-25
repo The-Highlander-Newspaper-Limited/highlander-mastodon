@@ -24,7 +24,7 @@ class ActivityPub::QuoteAuthorizationsController < ActivityPub::BaseController
     return not_found unless @quote.status.present? && @quote.quoted_status.present?
 
     authorize @quote.quoted_status, :show?
-  rescue ActiveRecord::RecordNotFound, Mastodon::NotPermittedError
+  rescue Mastodon::NotPermittedError
     not_found
   end
 end
