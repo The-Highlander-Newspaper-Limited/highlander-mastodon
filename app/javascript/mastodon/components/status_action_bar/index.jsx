@@ -27,8 +27,9 @@ import { IconButton } from '../icon_button';
 import { injectIntl } from '../intl';
 import { BoostButton } from '../status/boost_button';
 import { RemoveQuoteHint } from './remove_quote_hint';
-import { quoteItemState, selectStatusState } from '../status/boost_button_utils';
+import { quoteItemState } from '../status/boost_button_utils';
 import composeOverride from 'mastodon/lib/compose_override';
+import { selectStatusConditions } from '@/mastodon/selectors/statuses';
 
 
 const messages = defineMessages({
@@ -73,7 +74,7 @@ const mapStateToProps = (state, { status }) => {
   return ({
     relationship: state.getIn(['relationships', status.getIn(['account', 'id'])]),
     quotedAccountId: quotedStatusId ? state.getIn(['statuses', quotedStatusId, 'account']) : null,
-    statusQuoteState: selectStatusState(state, status),
+    statusQuoteState: selectStatusConditions(state, status.get('id')),
   });
 };
 
@@ -319,7 +320,7 @@ class StatusActionBar extends ImmutablePureComponent {
         menu.push({ text: intl.formatMessage(messages.delete), action: this.handleDeleteClick, dangerous: true });
         menu.push({ text: intl.formatMessage(messages.redraft), action: this.handleRedraftClick, dangerous: true });
       } else {
-        if (canPost(permissions)) {
+        if (canPost(permissions) && !account.get('invalid_handle')) {
           menu.push({ text: intl.formatMessage(messages.mention, { name: account.get('username') }), action: this.handleMentionClick });
           menu.push(null);
         }
@@ -348,7 +349,7 @@ class StatusActionBar extends ImmutablePureComponent {
 
         menu.push({ text: intl.formatMessage(messages.report, { name: account.get('username') }), action: this.handleReport, dangerous: true });
 
-        if (account.get('acct') !== account.get('username')) {
+        if (account.get('acct') !== account.get('username') && !account.get('invalid_handle')) {
           const domain = account.get('acct').split('@')[1];
 
           menu.push(null);
@@ -403,7 +404,7 @@ class StatusActionBar extends ImmutablePureComponent {
         )}
         { canReblog(permissions) && (
           <div className='status__action-bar__button-wrapper'>
-            <BoostButton status={status} counters={withCounters} permissions={permissions} />
+            <BoostButton statusId={status.get('id')} counters={withCounters} permissions={permissions} />
           </div>
         )}
         { canFavourite(permissions) && (
