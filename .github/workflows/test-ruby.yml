@@ -142,7 +142,7 @@ jobs:
           tar xvzf artifacts.tar.gz
 
       - name: Set up Ruby environment
-        timeout-minutes: 15
+        timeout-minutes: 25
         uses: ./.github/actions/setup-ruby
         with:
           ruby-version: ${{ matrix.ruby-version}}
@@ -239,7 +239,7 @@ jobs:
 
       - name: Set up Ruby environment
         uses: ./.github/actions/setup-ruby
-        timeout-minutes: 15
+        timeout-minutes: 25
         with:
           ruby-version: ${{ matrix.ruby-version}}
           additional-system-dependencies: ffmpeg
@@ -375,7 +375,7 @@ jobs:
 
       - name: Set up Ruby environment
         uses: ./.github/actions/setup-ruby
-        timeout-minutes: 15
+        timeout-minutes: 25
         with:
           ruby-version: ${{ matrix.ruby-version}}
           additional-system-dependencies: ffmpeg
