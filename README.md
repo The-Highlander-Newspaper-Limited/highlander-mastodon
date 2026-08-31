@@ -63,10 +63,11 @@ product behavior in this repository intentionally differs from upstream.
 
 ## Requirements
 
-- Ruby 3.2+
-- PostgreSQL 14+
-- Redis 7.0+
-- Node.js 20+
+- **Ruby** 3.3+
+- **PostgreSQL** 14+
+- **Redis** 7.0+
+- **Node.js** 22+
+- **FFmpeg** 5.1+
 
 ## Development
 
@@ -101,12 +102,12 @@ Useful upstream links:
 
 ## License
 
-Copyright (c) 2016-2025 Eugen Rochko (+ [`mastodon authors`](AUTHORS.md))
+Copyright (c) 2016-2026 Eugen Rochko (+ [`mastodon authors`](AUTHORS.md))
 
 Licensed under GNU Affero General Public License as stated in the [LICENSE](LICENSE):
 
 ```text
-Copyright (c) 2016-2025 Eugen Rochko & other Mastodon contributors
+Copyright (c) 2016-2026 Eugen Rochko & other Mastodon contributors
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU Affero General Public License as published by the Free

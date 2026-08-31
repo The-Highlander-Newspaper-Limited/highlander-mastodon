@@ -36,7 +36,7 @@ const randomUpTo = max =>
  * @typedef {import('mastodon/store').AppDispatch} Dispatch
  * @typedef {import('mastodon/store').GetState} GetState
  * @typedef {import('redux').UnknownAction} UnknownAction
- * @typedef {function(Dispatch, GetState): Promise<void>} FallbackFunction
+ * @typedef {(dispatch: Dispatch, getState: GetState) => Promise<void>} FallbackFunction
  */
 
 /**
@@ -45,12 +45,15 @@ const randomUpTo = max =>
  * @param {Object.<string, string>} params
  * @param {Object} options
  * @param {FallbackFunction} [options.fallback]
- * @param {function(): UnknownAction} [options.fillGaps]
- * @param {function(object): boolean} [options.accept]
- * @returns {function(): void}
+ * @param {() => UnknownAction} [options.fillGaps]
+ * @param {(status: object) => boolean} [options.accept]
+ * @returns {() => void}
  */
 export const connectTimelineStream = (timelineId, channelName, params = {}, options = {}) => {
   const { messages } = getLocale();
+
+  // Public streams are currently not returning personalized quote policies
+  const bogusQuotePolicy = channelName.startsWith('public') || channelName.startsWith('hashtag');
 
   return connectStream(channelName, params, (dispatch, getState) => {
     // @ts-ignore
@@ -97,11 +100,11 @@ export const connectTimelineStream = (timelineId, channelName, params = {}, opti
         switch (data.event) {
         case 'update':
           // @ts-expect-error
-          dispatch(updateTimeline(timelineId, JSON.parse(data.payload), options.accept));
+          dispatch(updateTimeline(timelineId, JSON.parse(data.payload), { accept: options.accept, bogusQuotePolicy }));
           break;
         case 'status.update':
           // @ts-expect-error
-          dispatch(updateStatus(JSON.parse(data.payload)));
+          dispatch(updateStatus(JSON.parse(data.payload), { bogusQuotePolicy }));
           break;
         case 'delete':
           dispatch(deleteFromTimelines(data.payload));
@@ -156,7 +159,7 @@ async function refreshHomeTimelineAndNotification(dispatch) {
 }
 
 /**
- * @returns {function(): void}
+ * @returns {() => void}
  */
 export const connectUserStream = () =>
   connectTimelineStream('home', 'user', {}, {
@@ -168,7 +171,7 @@ export const connectUserStream = () =>
 /**
  * @param {Object} options
  * @param {boolean} [options.onlyMedia]
- * @returns {function(): void}
+ * @returns {() => void}
  */
 export const connectCommunityStream = ({ onlyMedia } = {}) =>
   connectTimelineStream(`community${onlyMedia ? ':media' : ''}`, `public:local${onlyMedia ? ':media' : ''}`, {}, {
@@ -180,7 +183,7 @@ export const connectCommunityStream = ({ onlyMedia } = {}) =>
  * @param {Object} options
  * @param {boolean} [options.onlyMedia]
  * @param {boolean} [options.onlyRemote]
- * @returns {function(): void}
+ * @returns {() => void}
  */
 export const connectPublicStream = ({ onlyMedia, onlyRemote } = {}) =>
   connectTimelineStream(`public${onlyRemote ? ':remote' : ''}${onlyMedia ? ':media' : ''}`, `public${onlyRemote ? ':remote' : ''}${onlyMedia ? ':media' : ''}`, {}, {
@@ -192,21 +195,21 @@ export const connectPublicStream = ({ onlyMedia, onlyRemote } = {}) =>
  * @param {string} columnId
  * @param {string} tagName
  * @param {boolean} onlyLocal
- * @param {function(object): boolean} accept
- * @returns {function(): void}
+ * @param {(status: object) => boolean} accept
+ * @returns {() => void}
  */
 export const connectHashtagStream = (columnId, tagName, onlyLocal, accept) =>
   connectTimelineStream(`hashtag:${columnId}${onlyLocal ? ':local' : ''}`, `hashtag${onlyLocal ? ':local' : ''}`, { tag: tagName }, { accept });
 
 /**
- * @returns {function(): void}
+ * @returns {() => void}
  */
 export const connectDirectStream = () =>
   connectTimelineStream('direct', 'direct');
 
 /**
  * @param {string} listId
- * @returns {function(): void}
+ * @returns {() => void}
  */
 export const connectListStream = listId =>
   connectTimelineStream(`list:${listId}`, 'list', { list: listId }, {
