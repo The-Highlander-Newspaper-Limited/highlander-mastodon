@@ -10,7 +10,10 @@ RSpec.describe 'Share page', :js, :streaming do
   let(:confirmed_at)        { Time.zone.now }
   let(:finished_onboarding) { true }
 
-  before { as_a_logged_in_user }
+  before do
+    as_a_logged_in_user
+    bob.update!(role: Fabricate(:user_role, permissions: UserRole::FLAGS[:create_statuses]))
+  end
 
   it 'allows posting a new status' do
     visit share_path
@@ -19,6 +22,8 @@ RSpec.describe 'Share page', :js, :streaming do
       .to have_css('.modal-layout__mastodon')
       .and have_css('div#mastodon-compose')
       .and have_css('.compose-form__submit')
+    expect(find_by_id('mastodon-compose')['data-props'])
+      .to eq('{"locale":"en"}')
 
     fill_in_form
 

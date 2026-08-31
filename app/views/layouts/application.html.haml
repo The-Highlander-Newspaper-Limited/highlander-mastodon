@@ -1,8 +1,23 @@
 !!! 5
-%html{ lang: I18n.locale }
+%html{ html_attributes }
   %head
     %meta{ charset: 'utf-8' }/
     %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' }/
+
+    - if ENV['STAGING_BANNER'] == 'true'
+      %meta{ name: 'robots', content: 'noindex, nofollow, noarchive' }/
+      %style{ nonce: request.content_security_policy_nonce }
+        :plain
+          #staging-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: repeating-linear-gradient(45deg, #ff6a00, #ff6a00 10px, #ffb800 10px, #ffb800 20px);
+            z-index: 2147483000;
+            pointer-events: none;
+          }
 
     - if cdn_host?
       %link{ rel: 'dns-prefetch', href: cdn_host }/
@@ -20,7 +35,8 @@
     - if use_mask_icon?
       %link{ rel: 'mask-icon', href: frontend_asset_path('images/logo-symbol-icon.svg'), color: '#6364FF' }/
     %link{ rel: 'manifest', href: manifest_path(format: :json) }/
-    = theme_color_tags current_theme
+    = javascript_inline_tag 'theme-selection.js'
+    = theme_color_tags color_scheme
     %meta{ name: 'mobile-web-app-capable', content: 'yes' }/
 
     %title= html_title
@@ -42,6 +58,9 @@
     = yield :header_tags
 
   %body{ class: body_classes }
+    - if ENV['STAGING_BANNER'] == 'true'
+      #staging-banner{ 'aria-hidden' => 'true', 'title' => 'Staging environment' }
+
     = content_for?(:content) ? yield(:content) : yield
 
     .logo-resources{ 'tabindex' => '-1', 'inert' => true, 'aria-hidden' => 'true' }
